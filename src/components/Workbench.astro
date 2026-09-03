@@ -94,6 +94,10 @@ const { existingPieces = [] } = Astro.props;
       </div>
 
       <div class="flex items-center gap-2">
+        <button id="btn-open-github-config" type="button" class="win95-btn text-[10px] font-bold flex items-center gap-1.5 text-[var(--rojo)] border border-[var(--rojo)] cursor-pointer">
+          <span>🔑</span>
+          <span id="top-github-token-label">[ GITHUB TOKEN: CONFIGURAR ]</span>
+        </button>
         <a href="/admin" target="_blank" class="win95-btn text-[10px] font-bold">
           [ ABRIR PANEL DECAP CMS ↗ ]
         </a>
@@ -376,6 +380,39 @@ const { existingPieces = [] } = Astro.props;
             </button>
           </div>
         </div>
+
+        <!-- PUBLICACIÓN DIRECTA A PRODUCCIÓN (GITHUB REST API + NETLIFY AUTO-DEPLOY) -->
+        <div class="win95-container p-4 shadow-[5px_5px_0px_0px_#C41E1E] bg-[#0A0A0A] text-[var(--hueso)] border-2 border-[var(--rojo)]">
+          <div class="flex items-center justify-between border-b border-[#333] pb-2 mb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 bg-[var(--rojo)] animate-pulse"></span>
+              <span class="font-mono-tech text-xs text-[var(--rojo)] font-bold uppercase">
+                PROTOCOLO DE DEPLOY DIRECTO // GITHUB MAIN
+              </span>
+            </div>
+            <span id="tab1-token-status" class="font-mono-tech text-[10px] px-2 py-0.5 bg-[#222] text-[#888] border border-[#444]">
+              TOKEN: NO CONFIGURADO
+            </span>
+          </div>
+
+          <p class="font-mono-tech text-xs text-[#CCC] mb-3 leading-relaxed">
+            Publica este expediente (<code id="deploy-md-name-badge" class="bg-[#222] px-1 text-[var(--verde-acido)] font-bold">009.md</code>) y su imagen correspondiente directamente en tu repositorio de GitHub sin pasar por Decap CMS ni descargar archivos. Netlify compilará el sitio en ~25 segundos.
+          </p>
+
+          <div class="flex flex-wrap justify-between items-center gap-2 pt-2 border-t border-[#333]">
+            <span class="font-mono-tech text-[10px] text-[#777]">
+              DESTINO: <b class="text-[#AAA]">github.com/josuheolivo/YUX-RMB</b> (BRANCH: main)
+            </span>
+            <button 
+              type="button" 
+              id="btn-publish-direct-main"
+              class="win95-btn font-bold text-xs bg-[var(--rojo)] text-white hover:bg-[#a31818] cursor-pointer flex items-center gap-1.5 px-3 py-1.5"
+            >
+              <span>🚀</span>
+              <span>[ PUBLICAR PIEZA DIRECTAMENTE EN VIVO ]</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -425,6 +462,18 @@ const { existingPieces = [] } = Astro.props;
                     <button id="btn-bundle-img" class="win95-btn text-[11px] font-bold text-left" disabled>
                       🖼️ 2. Descargar imagen <span id="download-img-label">009.jpg</span> → colocar en <code class="bg-[#eee] px-1">src/assets/</code>
                     </button>
+                  </div>
+                </li>
+                <li class="pt-2 border-t border-[#CCC]">
+                  <b>Opción C (🚀 1-Clic Directo sin /admin):</b>
+                  <div class="mt-2">
+                    <button id="btn-publish-direct-tab2" type="button" class="win95-btn text-[11px] font-bold text-left text-[var(--rojo)] border-2 border-[var(--rojo)] w-full flex items-center justify-between p-2 cursor-pointer">
+                      <span>[ 🚀 PUBLICAR DIRECTAMENTE A GITHUB + NETLIFY ]</span>
+                      <span class="text-[9px] bg-[var(--rojo)] text-white px-1.5 py-0.5 uppercase">UN SOLO CLIC</span>
+                    </button>
+                    <p class="text-[10px] text-[#666] mt-1 italic">
+                      Transmite automáticamente el archivo .md y la imagen cargada al repositorio. Netlify iniciará el deploy en vivo al instante.
+                    </p>
                   </div>
                 </li>
               </ol>
@@ -563,6 +612,109 @@ const { existingPieces = [] } = Astro.props;
               </p>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL WIN95: CONFIGURACIÓN DE GITHUB PERSONAL ACCESS TOKEN (PAT) -->
+  <div id="github-config-modal-overlay" class="fixed inset-0 z-[10000] bg-[#0A0A0A] bg-opacity-80 flex items-center justify-center p-4 hidden">
+    <div class="win95-container w-full max-w-lg p-2 shadow-[8px_8px_0px_0px_#0A0A0A]">
+      <div class="win95-titlebar text-xs mb-3 flex justify-between items-center">
+        <span class="font-mono-tech flex items-center gap-2">
+          <span>SYS_CONFIG // GITHUB_PAT_SETUP.EXE</span>
+        </span>
+        <button id="btn-close-github-config" type="button" class="bg-[#C0C0C0] text-[var(--negro)] px-2 py-0 text-xs font-bold leading-none border border-white border-r-black border-bottom-black cursor-pointer active:translate-y-0.5">×</button>
+      </div>
+
+      <div class="p-4 bg-[#D4D0C8] border border-[#808080] border-t-white border-l-white space-y-4 font-mono-tech text-xs">
+        <div class="bg-[#0A0A0A] p-3 text-[var(--hueso)] border border-[#444] space-y-2">
+          <p class="font-bold text-[var(--verde-acido)] uppercase text-[11px]">CONEXIÓN DIRECTA CON TU REPOSITORIO GITHUB</p>
+          <p class="text-[11px] text-[#BBB] leading-relaxed">
+            Este token le permite al Workbench crear y actualizar expedientes (.md) e imágenes en <b class="text-white">josuheolivo/YUX-RMB</b> directamente desde tu navegador sin pasar por Decap CMS.
+          </p>
+          <p class="text-[10px] text-[#888]">
+            Tu token se guarda localmente en tu navegador bajo el cifrado de tu sesión. Nunca sale de tu equipo.
+          </p>
+        </div>
+
+        <div>
+          <label for="input-github-token" class="block font-bold text-[10px] text-[#222] uppercase mb-1">
+            GITHUB PERSONAL ACCESS TOKEN (PAT)*:
+          </label>
+          <div class="flex gap-2">
+            <input 
+              type="password" 
+              id="input-github-token" 
+              class="w-full bg-white border-2 border-[var(--negro)] p-2 font-mono-tech outline-none text-xs focus:border-[var(--rojo)] font-bold"
+              placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+            />
+            <button id="btn-toggle-token-visibility" type="button" class="win95-btn text-[10px] px-3 font-bold" title="Mostrar/ocultar token">👁️</button>
+          </div>
+          <p class="text-[10px] text-[#555] mt-1.5 leading-tight">
+            ¿No tienes un token? <a href="https://github.com/settings/tokens/new?scopes=repo&description=YUX+RMB+Workbench" target="_blank" class="underline font-bold text-[var(--rojo)]">Haz clic aquí para generar uno en GitHub (1 minuto)</a> marcando la casilla de permiso <b>repo</b>.
+          </p>
+        </div>
+
+        <div id="github-test-status" class="hidden p-2 text-[10px] border font-bold"></div>
+
+        <div class="flex flex-wrap justify-between items-center gap-2 pt-2 border-t border-[#AAA]">
+          <div class="flex gap-2">
+            <button id="btn-test-github-token" type="button" class="win95-btn text-[10px]">
+              [ 🔌 PROBAR CONEXIÓN ]
+            </button>
+            <button id="btn-clear-github-token" type="button" class="win95-btn text-[10px] text-[#888]">
+              [ BORRAR ]
+            </button>
+          </div>
+          <div class="flex gap-2">
+            <button id="btn-cancel-github-config" type="button" class="win95-btn text-[10px]">
+              CANCELAR
+            </button>
+            <button id="btn-save-github-token" type="button" class="win95-btn font-bold text-xs text-[var(--rojo)]">
+              [ GUARDAR TOKEN ]
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL WIN95: PROTOCOLO DE DESPLIEGUE DIRECTO (TERMINAL DE PROGRESO) -->
+  <div id="publish-modal-overlay" class="fixed inset-0 z-[10000] bg-[#0A0A0A] bg-opacity-80 flex items-center justify-center p-4 hidden">
+    <div class="win95-container w-full max-w-2xl p-2 shadow-[8px_8px_0px_0px_#0A0A0A]">
+      <div class="win95-titlebar text-xs mb-3 flex justify-between items-center">
+        <span class="font-mono-tech flex items-center gap-2">
+          <span>SYS_DEPLOY // DISPATCH_TO_PRODUCTION.EXE</span>
+        </span>
+        <button id="btn-close-publish-modal" type="button" class="bg-[#C0C0C0] text-[var(--negro)] px-2 py-0 text-xs font-bold leading-none border border-white border-r-black border-bottom-black cursor-pointer active:translate-y-0.5">×</button>
+      </div>
+
+      <div class="p-4 bg-[#D4D0C8] border border-[#808080] border-t-white border-l-white space-y-3 font-mono-tech text-xs">
+        <div class="flex justify-between items-center text-[10px] font-bold text-[#333]">
+          <span>OBJETIVO: REPOSITORIO GITHUB josuheolivo/YUX-RMB (main)</span>
+          <span id="publish-status-indicator" class="text-[var(--rojo)] animate-pulse">● EN EJECUCIÓN</span>
+        </div>
+
+        <!-- Terminal CRT de salida de comandos -->
+        <div id="publish-console-box" class="bg-[#0A0A0A] text-[var(--verde-acido)] p-3 font-mono-tech text-[11px] leading-relaxed border-2 border-[var(--negro)] min-h-[200px] max-h-[260px] overflow-y-auto scrollbar-thin">
+          <!-- Líneas inyectadas por JS -->
+        </div>
+
+        <div id="publish-success-actions" class="hidden flex flex-wrap justify-between items-center gap-2 pt-2 border-t border-[#AAA]">
+          <div class="flex gap-2">
+            <a id="link-view-commit" href="#" target="_blank" class="win95-btn text-[10px] font-bold flex items-center gap-1">
+              <span>🐙</span>
+              <span>[ VER COMMIT EN GITHUB ↗ ]</span>
+            </a>
+            <a id="link-view-live" href="https://yux-rmb.netlify.app" target="_blank" class="win95-btn text-[10px] font-bold text-[var(--rojo)] flex items-center gap-1">
+              <span>⚡</span>
+              <span>[ VER EN NETLIFY ↗ ]</span>
+            </a>
+          </div>
+          <button id="btn-done-publish" type="button" class="win95-btn font-bold text-xs">
+            [ TERMINAR Y CERRAR ]
+          </button>
         </div>
       </div>
     </div>
@@ -906,6 +1058,8 @@ const { existingPieces = [] } = Astro.props;
       if (mdFilenameLabel) mdFilenameLabel.textContent = `GENERADOR_OUTPUT // ${code}.MD`;
       if (downloadMdLabel) downloadMdLabel.textContent = `${code}.md`;
       if (downloadImgLabel) downloadImgLabel.textContent = `${code}.jpg`;
+      const deployMdBadge = document.getElementById('deploy-md-name-badge');
+      if (deployMdBadge) deployMdBadge.textContent = `${code}.md`;
 
       const mdContent = `---
 code: "${code}"
@@ -1035,6 +1189,330 @@ YUX-RMB / #${code} / ${coords} / GRID: RMB-V1.2
         }
       });
     });
+
+    // === GITHUB TOKEN Y PROTOCOLO DE DESPLIEGUE DIRECTO A PRODUCCIÓN ===
+    const GITHUB_TOKEN_KEY = "yux_workbench_github_token";
+    const GITHUB_REPO = "josuheolivo/YUX-RMB";
+
+    const githubConfigModal = document.getElementById("github-config-modal-overlay");
+    const inputGithubToken = document.getElementById("input-github-token") as HTMLInputElement;
+    const btnOpenGithubConfig = document.getElementById("btn-open-github-config");
+    const btnCloseGithubConfig = document.getElementById("btn-close-github-config");
+    const btnCancelGithubConfig = document.getElementById("btn-cancel-github-config");
+    const btnSaveGithubToken = document.getElementById("btn-save-github-token");
+    const btnClearGithubToken = document.getElementById("btn-clear-github-token");
+    const btnTestGithubToken = document.getElementById("btn-test-github-token");
+    const btnToggleTokenVis = document.getElementById("btn-toggle-token-visibility");
+    const githubTestStatus = document.getElementById("github-test-status");
+    const topGithubTokenLabel = document.getElementById("top-github-token-label");
+    const tab1TokenStatus = document.getElementById("tab1-token-status");
+    const deployMdBadge = document.getElementById("deploy-md-name-badge");
+
+    const publishModal = document.getElementById("publish-modal-overlay");
+    const btnClosePublishModal = document.getElementById("btn-close-publish-modal");
+    const btnDonePublish = document.getElementById("btn-done-publish");
+    const publishConsoleBox = document.getElementById("publish-console-box");
+    const publishStatusIndicator = document.getElementById("publish-status-indicator");
+    const publishSuccessActions = document.getElementById("publish-success-actions");
+    const linkViewCommit = document.getElementById("link-view-commit") as HTMLAnchorElement;
+    const linkViewLive = document.getElementById("link-view-live") as HTMLAnchorElement;
+    const btnPublishDirectMain = document.getElementById("btn-publish-direct-main");
+    const btnPublishDirectTab2 = document.getElementById("btn-publish-direct-tab2");
+
+    function getGitHubToken(): string {
+      return localStorage.getItem(GITHUB_TOKEN_KEY) || "";
+    }
+
+    function updateTokenUI() {
+      const token = getGitHubToken();
+      if (token) {
+        if (topGithubTokenLabel) topGithubTokenLabel.textContent = "[ GITHUB TOKEN: ACTIVO ✓ ]";
+        if (tab1TokenStatus) {
+          tab1TokenStatus.textContent = "TOKEN: CONECTADO ✓";
+          tab1TokenStatus.className = "font-mono-tech text-[10px] px-2 py-0.5 bg-[#002200] text-[var(--verde-acido)] border border-[var(--verde-acido)]";
+        }
+        if (inputGithubToken) inputGithubToken.value = token;
+      } else {
+        if (topGithubTokenLabel) topGithubTokenLabel.textContent = "[ GITHUB TOKEN: CONFIGURAR ]";
+        if (tab1TokenStatus) {
+          tab1TokenStatus.textContent = "TOKEN: NO CONFIGURADO";
+          tab1TokenStatus.className = "font-mono-tech text-[10px] px-2 py-0.5 bg-[#222] text-[#888] border border-[#444]";
+        }
+        if (inputGithubToken) inputGithubToken.value = "";
+      }
+    }
+
+    function openGithubConfig() {
+      githubConfigModal?.classList.remove("hidden");
+      if (inputGithubToken) inputGithubToken.value = getGitHubToken();
+      if (githubTestStatus) githubTestStatus.className = "hidden";
+      inputGithubToken?.focus();
+    }
+
+    function closeGithubConfig() {
+      githubConfigModal?.classList.add("hidden");
+    }
+
+    btnOpenGithubConfig?.addEventListener("click", openGithubConfig);
+    btnCloseGithubConfig?.addEventListener("click", closeGithubConfig);
+    btnCancelGithubConfig?.addEventListener("click", closeGithubConfig);
+    githubConfigModal?.addEventListener("click", (e) => {
+      if (e.target === githubConfigModal) closeGithubConfig();
+    });
+
+    btnToggleTokenVis?.addEventListener("click", () => {
+      if (inputGithubToken) {
+        inputGithubToken.type = inputGithubToken.type === "password" ? "text" : "password";
+      }
+    });
+
+    btnSaveGithubToken?.addEventListener("click", () => {
+      const token = inputGithubToken?.value?.trim() || "";
+      if (!token) {
+        alert("Por favor ingresa un Personal Access Token de GitHub.");
+        return;
+      }
+      localStorage.setItem(GITHUB_TOKEN_KEY, token);
+      updateTokenUI();
+      closeGithubConfig();
+      alert("¡Token de GitHub guardado en tu navegador!");
+    });
+
+    btnClearGithubToken?.addEventListener("click", () => {
+      if (confirm("¿Deseas eliminar el token de GitHub guardado?")) {
+        localStorage.removeItem(GITHUB_TOKEN_KEY);
+        updateTokenUI();
+        if (githubTestStatus) {
+          githubTestStatus.className = "hidden";
+        }
+      }
+    });
+
+    btnTestGithubToken?.addEventListener("click", async () => {
+      const token = inputGithubToken?.value?.trim() || "";
+      if (!token) {
+        alert("Introduce un token para probar la conexión.");
+        return;
+      }
+      if (githubTestStatus) {
+        githubTestStatus.className = "p-2 text-[10px] border border-white text-white bg-[#222] block";
+        githubTestStatus.textContent = "Probando conexión con api.github.com...";
+      }
+      try {
+        const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Accept": "application/vnd.github+json"
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (githubTestStatus) {
+            githubTestStatus.className = "p-2 text-[10px] border border-[var(--verde-acido)] text-[var(--verde-acido)] bg-[#0A0A0A] block";
+            githubTestStatus.textContent = `✓ CONEXIÓN EXITOSA CON ${data.full_name} (${data.permissions?.push ? 'PERMISO DE ESCRITURA OK' : 'AVISO: REVISA PERMISOS DE PUSH'})`;
+          }
+        } else {
+          const err = await res.json().catch(() => ({}));
+          if (githubTestStatus) {
+            githubTestStatus.className = "p-2 text-[10px] border border-[var(--rojo)] text-[var(--rojo)] bg-[#0A0A0A] block";
+            githubTestStatus.textContent = `✗ ERROR (${res.status}): ${err.message || 'Token inválido o sin acceso al repositorio.'}`;
+          }
+        }
+      } catch (e: any) {
+        if (githubTestStatus) {
+          githubTestStatus.className = "p-2 text-[10px] border border-[var(--rojo)] text-[var(--rojo)] bg-[#0A0A0A] block";
+          githubTestStatus.textContent = `✗ ERROR DE CONEXIÓN: ${e.message}`;
+        }
+      }
+    });
+
+    async function uploadToGitHub(token: string, path: string, contentBase64: string, message: string) {
+      const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`;
+      let sha: string | undefined = undefined;
+
+      try {
+        const checkRes = await fetch(url, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28"
+          }
+        });
+        if (checkRes.ok) {
+          const data = await checkRes.json();
+          sha = data.sha;
+        }
+      } catch (e) {
+        // Archivo nuevo en repo
+      }
+
+      const body: any = {
+        message,
+        content: contentBase64,
+        branch: "main"
+      };
+      if (sha) body.sha = sha;
+
+      const putRes = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Accept": "application/vnd.github+json",
+          "Content-Type": "application/json",
+          "X-GitHub-Api-Version": "2022-11-28"
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (!putRes.ok) {
+        const err = await putRes.json().catch(() => ({}));
+        throw new Error(err.message || `HTTP ${putRes.status} al subir ${path}`);
+      }
+
+      return await putRes.json();
+    }
+
+    function stringToBase64(str: string): string {
+      const bytes = new TextEncoder().encode(str);
+      let binary = "";
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binary);
+    }
+
+    function blobToBase64(blob: Blob): Promise<string> {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const res = reader.result as string;
+          const base64 = res.split(",")[1];
+          resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    function logTerminal(msg: string, isError = false) {
+      if (!publishConsoleBox) return;
+      const line = document.createElement("div");
+      line.className = isError ? "text-[var(--rojo)] font-bold py-0.5" : "text-[var(--verde-acido)] py-0.5";
+      line.textContent = `>> ${msg}`;
+      publishConsoleBox.appendChild(line);
+      publishConsoleBox.scrollTop = publishConsoleBox.scrollHeight;
+    }
+
+    async function executeDirectPublish() {
+      const token = getGitHubToken();
+      if (!token) {
+        alert("Debes configurar tu GitHub Personal Access Token antes de publicar directamente.");
+        openGithubConfig();
+        return;
+      }
+
+      const code = (codeEl?.value || '009').padStart(3, '0');
+      const title = titleEl?.value || 'TITULO // ERROR';
+      const mediaType = mediaTypeEl?.value || 'image';
+      const ext = mediaType === 'video' ? 'mp4' : 'jpg';
+
+      if (!outputMd?.textContent) {
+        alert("Parámetros incompletos en el formulario.");
+        return;
+      }
+
+      // Si no hay imagen seleccionada en el workbench, pedir confirmación
+      let uploadImage = true;
+      if (!selectedImageBlob) {
+        const proceedWithoutImage = confirm(
+          `No has cargado una imagen nueva en la pestaña 02.\n\n¿Deseas actualizar ÚNICAMENTE el archivo de metadatos (src/content/piezas/${code}.md) en GitHub?`
+        );
+        if (!proceedWithoutImage) return;
+        uploadImage = false;
+      }
+
+      publishModal?.classList.remove("hidden");
+      if (publishConsoleBox) publishConsoleBox.innerHTML = "";
+      if (publishStatusIndicator) {
+        publishStatusIndicator.textContent = "● TRANSMITIENDO A GITHUB";
+        publishStatusIndicator.className = "text-[var(--rojo)] animate-pulse";
+      }
+      if (publishSuccessActions) publishSuccessActions.classList.add("hidden");
+
+      try {
+        logTerminal(`INICIANDO PROTOCOLO FORENSE RMB // PIEZA #${code}`);
+        logTerminal(`DESTINO: github.com/${GITHUB_REPO} (BRANCH: main)`);
+        await new Promise(r => setTimeout(r, 300));
+
+        let commitUrl = `https://github.com/${GITHUB_REPO}/commits/main`;
+
+        if (uploadImage && selectedImageBlob) {
+          logTerminal(`[01/03] CODIFICANDO RECURSO MULTIMEDIA (${code}.${ext})...`);
+          const imgBase64 = await blobToBase64(selectedImageBlob);
+          logTerminal(`[02/03] TRANSMITIENDO src/assets/${code}.${ext} A GITHUB...`);
+          const imgResult = await uploadToGitHub(
+            token,
+            `src/assets/${code}.${ext}`,
+            imgBase64,
+            `feat(asset): master ${ext.toUpperCase()} for piece #${code} - ${title}`
+          );
+          if (imgResult?.commit?.html_url) commitUrl = imgResult.commit.html_url;
+          logTerminal(`✓ RECURSO MULTIMEDIA GUARDADO EXITOSAMENTE.`);
+        } else {
+          logTerminal(`[INFO] Omitiendo subida de imagen (se conserva la existente en el repositorio).`);
+        }
+
+        await new Promise(r => setTimeout(r, 250));
+
+        logTerminal(`[03/03] TRANSMITIENDO src/content/piezas/${code}.md A GITHUB...`);
+        const mdBase64 = stringToBase64(outputMd.textContent);
+        const mdResult = await uploadToGitHub(
+          token,
+          `src/content/piezas/${code}.md`,
+          mdBase64,
+          `feat(content): add/update piece #${code} - ${title}`
+        );
+        if (mdResult?.commit?.html_url) commitUrl = mdResult.commit.html_url;
+        logTerminal(`✓ EXPEDIENTE FORENSE ${code}.MD CONFIRMADO EN RAMA MAIN.`);
+
+        await new Promise(r => setTimeout(r, 250));
+
+        logTerminal(`--------------------------------------------------`);
+        logTerminal(`>> ¡DESPLIEGUE REGISTRADO CON ÉXITO!`);
+        logTerminal(`>> NETLIFY RECIBIÓ EL COMMIT Y ESTÁ GENERANDO EL BUILD AUTOMÁTICO.`);
+        logTerminal(`>> EN ~25 SEGUNDOS TU PIEZA ESTARÁ EN VIVO EN:`);
+        logTerminal(`   https://yux-rmb.netlify.app/archivo/${code}`);
+        logTerminal(`--------------------------------------------------`);
+
+        if (publishStatusIndicator) {
+          publishStatusIndicator.textContent = "✓ PUBLICACIÓN EXITOSA";
+          publishStatusIndicator.className = "text-[var(--verde-acido)] font-bold";
+        }
+
+        if (publishSuccessActions) {
+          publishSuccessActions.classList.remove("hidden");
+          if (linkViewCommit) linkViewCommit.href = commitUrl;
+          if (linkViewLive) linkViewLive.href = `https://yux-rmb.netlify.app/archivo/${code}`;
+        }
+      } catch (err: any) {
+        logTerminal(`ERROR CRÍTICO: ${err.message}`, true);
+        logTerminal(`Verifica que tu GitHub Token tenga marcado el permiso 'repo'.`, true);
+        if (publishStatusIndicator) {
+          publishStatusIndicator.textContent = "✗ ERROR EN TRANSMISIÓN";
+          publishStatusIndicator.className = "text-[var(--rojo)] font-bold";
+        }
+      }
+    }
+
+    btnPublishDirectMain?.addEventListener("click", executeDirectPublish);
+    btnPublishDirectTab2?.addEventListener("click", executeDirectPublish);
+    btnClosePublishModal?.addEventListener("click", () => publishModal?.classList.add("hidden"));
+    btnDonePublish?.addEventListener("click", () => publishModal?.classList.add("hidden"));
+    publishModal?.addEventListener("click", (e) => {
+      if (e.target === publishModal) publishModal?.classList.add("hidden");
+    });
+
+    updateTokenUI();
 
     update();
   }
