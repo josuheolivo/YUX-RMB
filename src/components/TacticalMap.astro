@@ -1,0 +1,153 @@
+---
+interface Props {
+  pieces: Array<{
+    data: {
+      code: string;
+      title: string;
+      subject: string;
+      coords: string;
+      lat?: number;
+      lng?: number;
+      error_message: string;
+      accent_color: string;
+      status: string;
+    };
+  }>;
+}
+
+const { pieces } = Astro.props;
+const validPieces = pieces.filter(p => p.data.lat && p.data.lng);
+---
+
+<div class="w-full h-[80vh] border-2 border-[var(--negro)] relative bg-[#0A0A0A] overflow-hidden shadow-[4px_4px_0px_0px_#0A0A0A]">
+  <!-- Radar Grid Overlay (40px brutalist grid) -->
+  <div class="absolute inset-0 pointer-events-none z-[400] opacity-10 bg-[linear-gradient(to_right,#F0EDE6_1px,transparent_1px),linear-gradient(to_bottom,#F0EDE6_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+
+  <!-- HUD Militar Superior -->
+  <div class="absolute top-4 left-4 z-[500] bg-[#0A0A0A] border-2 border-[var(--concreto)] p-3 text-[var(--hueso)] font-mono-tech text-xs shadow-[3px_3px_0px_0px_#0A0A0A] max-w-xs sm:max-w-md">
+    <div class="flex items-center gap-2 mb-1">
+      <span class="inline-block w-2.5 h-2.5 bg-[var(--rojo)] animate-ping"></span>
+      <p class="text-[var(--rojo)] font-bold tracking-wider uppercase">RADAR // MONITOREO FORENSE DE MADRID</p>
+    </div>
+    <p class="text-[#AAA] text-[11px]">STATUS: DISRUPCIÓN ESTRUCTURAL DETECTADA</p>
+    <p class="text-[#666] text-[10px] mt-1">PROVEEDOR: OPENSTREETMAP (100% LIBRE // CERO API KEY)</p>
+  </div>
+
+  <!-- Controles y Leyenda Inferior -->
+  <div class="absolute bottom-4 left-4 z-[500] flex gap-2">
+    <button id="toggle-layer-btn" class="win95-btn text-[10px] font-bold">
+      [ CAPA: OSM TÁCTICO INVERTIDO ]
+    </button>
+  </div>
+
+  <div class="absolute bottom-4 right-4 z-[500] bg-[#0A0A0A] border border-[var(--concreto)] p-2.5 text-[var(--hueso)] font-mono-tech text-[10px] hidden sm:block">
+    <span class="text-[var(--concreto)]">INTERCEPCIONES:</span>
+    <span class="text-[var(--rojo)] ml-1 font-bold">[+] SYS_ALERT</span>
+    <span class="text-[#888] ml-2">CLICK NODO PARA EXTRACCIÓN</span>
+  </div>
+
+  <!-- Map Container -->
+  <div id="tactical-map" class="w-full h-full" data-pieces={JSON.stringify(validPieces)}></div>
+</div>
+
+<script>
+  import L from 'leaflet';
+  import 'leaflet/dist/leaflet.css';
+
+  const mapElement = document.getElementById('tactical-map');
+  if (mapElement && !mapElement.dataset.initialized) {
+    mapElement.dataset.initialized = 'true';
+    const piecesData = JSON.parse(mapElement.getAttribute('data-pieces') || '[]');
+
+    // Inicializar mapa centrado en Madrid
+    const map = L.map('tactical-map', {
+      center: [40.4180, -3.6980],
+      zoom: 14,
+      zoomControl: false,
+    });
+
+    // Control de zoom posicionado en la derecha
+    L.control.zoom({ position: 'topright' }).addTo(map);
+
+    // 1. Capa OpenStreetMap Pública con filtro CSS militar táctico (100% Libre, Cero API Key)
+    const osmTactical = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      className: 'tactical-tiles',
+      attribution: '&copy; OpenStreetMap contributors'
+    });
+
+    // 2. Capa Esri World Dark Gray Canvas (100% Libre, Cero API Key, estética monocromática nativa)
+    const esriDark = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 16,
+      attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
+    });
+
+    // Añadir por defecto OSM Táctico
+    osmTactical.addTo(map);
+    let currentMode = 'osm';
+
+    // Selector interactivo de capa
+    const toggleBtn = document.getElementById('toggle-layer-btn');
+    toggleBtn?.addEventListener('click', () => {
+      if (currentMode === 'osm') {
+        map.removeLayer(osmTactical);
+        esriDark.addTo(map);
+        currentMode = 'esri';
+        toggleBtn.textContent = '[ CAPA: ESRI DARK GRAY ]';
+      } else {
+        map.removeLayer(esriDark);
+        osmTactical.addTo(map);
+        currentMode = 'osm';
+        toggleBtn.textContent = '[ CAPA: OSM TÁCTICO INVERTIDO ]';
+      }
+    });
+
+    // Renderizar miras técnicas (crosshair)
+    piecesData.forEach((p: any) => {
+      const { lat, lng, code, title, error_message, accent_color, status } = p.data;
+      if (!lat || !lng) return;
+
+      const crosshairHtml = `
+        <div class="custom-crosshair" style="color: ${accent_color}; font-family: 'Courier New', monospace; font-size: 16px; font-weight: bold; text-shadow: 0 0 6px ${accent_color}; transform: translate(-50%, -50%);">
+          [+]
+        </div>
+      `;
+
+      const icon = L.divIcon({
+        className: 'custom-crosshair-icon',
+        html: crosshairHtml,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+      });
+
+      const popupHtml = `
+        <div class="win95-container p-2 text-[#0A0A0A] w-[260px] font-mono-tech select-none">
+          <div class="win95-titlebar text-[10px] mb-2 flex justify-between items-center">
+            <span>SYS_ALERT // #${code}.EXE</span>
+            <span class="text-[9px] bg-[var(--rojo)] px-1 py-0.2 text-white font-bold">${status}</span>
+          </div>
+          <p class="text-[11px] font-bold text-[#C41E1E] uppercase mb-1 animate-pulse tracking-tight">
+            ${error_message}
+          </p>
+          <p class="font-display text-sm leading-tight text-[#0A0A0A] mb-1 font-black">
+            ${title}
+          </p>
+          <p class="text-[9px] text-[#444] mb-3">
+            LAT: ${lat.toFixed(5)} // LNG: ${lng.toFixed(5)}
+          </p>
+          <div class="border-t border-[#888] pt-2 flex justify-end">
+            <a href="/archivo/${code}" class="win95-btn text-[10px] font-bold">
+              [ VER EVIDENCIA ]
+            </a>
+          </div>
+        </div>
+      `;
+
+      const marker = L.marker([lat, lng], { icon }).addTo(map);
+      marker.bindPopup(popupHtml, {
+        closeButton: false,
+        offset: [0, -10],
+      });
+    });
+  }
+</script>

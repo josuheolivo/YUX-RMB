@@ -1,0 +1,44 @@
+---
+import Glyph from './Glyph.astro';
+
+interface Props {
+  statusText?: string;
+  activePath?: string;
+}
+
+const { statusText = "[ARCHIVE STATUS: ACTIVE]", activePath } = Astro.props;
+
+const navItems = [
+  { label: "/ARCHIVO", href: "/archivo" },
+  { label: "/MAPA", href: "/mapa" },
+  { label: "/TERMINAL", href: "/terminal" },
+  { label: "/WORKBENCH", href: "/workbench" },
+  { label: "/SUMINISTROS", href: "/suministros" },
+  { label: "/ASSETS", href: "/assets" },
+  { label: "/MANIFIESTO", href: "/manifiesto" },
+];
+---
+
+<header class="mb-8 border-b-2 border-[var(--negro)] pb-4">
+  <div class="flex flex-wrap justify-between items-center gap-4 mb-3">
+    <a href="/" class="flex items-center gap-3 hover:opacity-75 transition-opacity duration-75">
+      <Glyph class="w-9 h-9 md:w-11 md:h-11 flex-shrink-0" />
+      <span class="font-display text-xl md:text-2xl tracking-tighter text-[var(--negro)]">YUX // RMB</span>
+    </a>
+
+    <div class="font-mono-tech text-xs uppercase tracking-wider text-[var(--rojo)] font-bold">
+      {statusText}
+    </div>
+  </div>
+
+  <nav class="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono-tech text-xs uppercase font-bold pt-2 border-t border-[var(--concreto)]">
+    {navItems.map((item) => (
+      <a 
+        href={item.href} 
+        class={`transition-colors duration-75 hover:text-[var(--rojo)] ${activePath === item.href ? 'text-[var(--rojo)] underline underline-offset-4' : 'text-[var(--negro)]'}`}
+      >
+        {item.label}
+      </a>
+    ))}
+  </nav>
+</header>

@@ -1,0 +1,272 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+---
+
+<Layout title="Suministros // Bloqueo de Prototipos">
+  <Navbar activePath="/suministros" statusText="[SYS_ALERT: PROTOTYPE_LOCKOUT]" />
+
+  <!-- Cabecera de Alerta de Sistema -->
+  <div class="mb-8 border-b-2 border-[var(--negro)] pb-4 flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2 font-mono-tech text-xs uppercase text-[var(--rojo)] font-bold mb-1">
+        <span class="inline-block w-2.5 h-2.5 bg-[var(--rojo)] animate-ping"></span>
+        <span>SYS_ALERT // PROTOCOLO DE RESTRICCIÓN MATERIAL</span>
+      </div>
+      <h1 class="font-display text-4xl md:text-6xl uppercase tracking-tighter leading-none text-[var(--negro)]">
+        PROTOTYPE_LOCKOUT
+      </h1>
+    </div>
+
+    <!-- Badge Rígido Obligatorio -->
+    <div>
+      <span class="font-mono-tech text-xs sm:text-sm font-bold bg-[var(--negro)] text-[var(--amarillo)] px-3 py-2 border-2 border-[var(--negro)] shadow-[3px_3px_0px_0px_#C41E1E] inline-block tracking-wider">
+        [BATCH 01: SÍNTESIS TEXTIL EN PROCESO // STOCK: 000]
+      </span>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <!-- Columna 1: Silueta Técnica Wireframe 2D (Plano de Patronaje) (7 cols) -->
+    <div class="lg:col-span-7 border-2 border-[var(--negro)] bg-[#0A0A0A] p-4 sm:p-6 shadow-[6px_6px_0px_0px_#0A0A0A] relative overflow-hidden text-[var(--hueso)]">
+      <!-- Grid de Blueprint -->
+      <div class="absolute inset-0 pointer-events-none opacity-15 bg-[linear-gradient(to_right,#B8B3AA_1px,transparent_1px),linear-gradient(to_bottom,#B8B3AA_1px,transparent_1px)] bg-[size:25px_25px]"></div>
+
+      <div class="flex justify-between items-center font-mono-tech text-[10px] text-[var(--concreto)] border-b border-[#333] pb-2 mb-4 relative z-10">
+        <span>PLANO TÉCNICO DE CORTE // REF: SWEAT-450-MAD</span>
+        <span>ESCALA: 1:10 // SECTOR: MADRID</span>
+      </div>
+
+      <!-- Vector Blueprint SVG Wireframe 2D -->
+      <div class="relative z-10 my-4 flex justify-center">
+        <svg viewBox="0 0 700 550" class="w-full h-auto max-h-[500px] select-none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#C41E1E" />
+            </marker>
+            <marker id="arrow-cyan" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#4DE8F4" />
+            </marker>
+          </defs>
+
+          <!-- Cotas de Dimensión Externa -->
+          <line x1="80" y1="520" x2="620" y2="520" stroke="#666" stroke-width="1" stroke-dasharray="4,4" />
+          <text x="350" y="538" fill="#888" font-family="Courier New, monospace" font-size="11" text-anchor="middle">ANCHO TOTAL PECHO / BOXY CUT: 680 MM</text>
+
+          <line x1="40" y1="120" x2="40" y2="480" stroke="#666" stroke-width="1" stroke-dasharray="4,4" />
+          <text x="30" y="300" fill="#888" font-family="Courier New, monospace" font-size="11" text-anchor="middle" transform="rotate(-90 30 300)">LONGITUD CUERPO: 740 MM</text>
+
+          <!-- Silueta Principal de Sudadera / Heavyweight Tee Wireframe 2D -->
+          <!-- Cuerpo -->
+          <polygon points="210,120 490,120 480,480 220,480" fill="none" stroke="#F0EDE6" stroke-width="2.5" />
+          
+          <!-- Cuello Caja Grueso (Ribete rígido) -->
+          <path d="M 300,120 Q 350,155 400,120" fill="none" stroke="#F0EDE6" stroke-width="2" />
+          <path d="M 305,120 Q 350,145 395,120" fill="none" stroke="#888" stroke-width="1.5" stroke-dasharray="3,3" />
+
+          <!-- Manga Izquierda (Visualmente a la derecha del SVG) con ETIQUETA TÉCNICA -->
+          <polygon points="490,120 640,240 590,300 482,210" fill="none" stroke="#F0EDE6" stroke-width="2.5" />
+          <!-- Manga Derecha -->
+          <polygon points="210,120 60,240 110,300 218,210" fill="none" stroke="#F0EDE6" stroke-width="2.5" />
+
+          <!-- Costuras de Hombro Caído (Drop Shoulder) -->
+          <line x1="210" y1="120" x2="218" y2="210" stroke="#4DE8F4" stroke-width="1.5" stroke-dasharray="4,3" />
+          <line x1="490" y1="120" x2="482" y2="210" stroke="#4DE8F4" stroke-width="1.5" stroke-dasharray="4,3" />
+
+          <!-- Bajo Canalé Grueso -->
+          <line x1="220" y1="450" x2="480" y2="450" stroke="#888" stroke-width="1.5" stroke-dasharray="3,3" />
+          <line x1="220" y1="480" x2="480" y2="480" stroke="#F0EDE6" stroke-width="2.5" />
+
+          <!-- ETIQUETA TÉCNICA EN LA MANGA IZQUIERDA (Punto focal solicitado) -->
+          <rect x="585" y="245" width="48" height="28" fill="#C41E1E" stroke="#FFFFFF" stroke-width="1.5" />
+          <text x="609" y="258" fill="#FFFFFF" font-family="Courier New, monospace" font-size="7" font-weight="bold" text-anchor="middle">RMB-TAG</text>
+          <text x="609" y="267" fill="#FFFFFF" font-family="Courier New, monospace" font-size="5.5" text-anchor="middle">40.415°N</text>
+
+          <!-- Callout Flecha hacia la Etiqueta Técnica en la Manga -->
+          <line x1="610" y1="210" x2="610" y2="240" stroke="#C41E1E" stroke-width="2" marker-end="url(#arrow)" />
+          <rect x="490" y="50" width="195" height="42" fill="#0A0A0A" stroke="#C41E1E" stroke-width="1.5" />
+          <text x="500" y="66" fill="#C41E1E" font-family="Courier New, monospace" font-size="9" font-weight="bold">ETIQUETA TÉCNICA EXTERIOR</text>
+          <text x="500" y="78" fill="#F0EDE6" font-family="Courier New, monospace" font-size="8">MANGA IZQ // GPS FORENSE</text>
+          <text x="500" y="88" fill="#AAA" font-family="Courier New, monospace" font-size="7">SERIGRAFÍA AL AGUA 5 TINTAS</text>
+
+          <!-- Callout Flecha hacia el Parche Reflectante Cuello -->
+          <line x1="350" y1="75" x2="350" y2="125" stroke="#4DE8F4" stroke-width="1.5" marker-end="url(#arrow-cyan)" />
+          <rect x="250" y="30" width="200" height="35" fill="#0A0A0A" stroke="#4DE8F4" stroke-width="1.5" />
+          <text x="260" y="46" fill="#4DE8F4" font-family="Courier New, monospace" font-size="9" font-weight="bold">PARCHE 3M REFLECTANTE</text>
+          <text x="260" y="58" fill="#F0EDE6" font-family="Courier New, monospace" font-size="8">CROMO LÍQUIDO RETROFUTURISTA</text>
+
+          <!-- Callout Línea de Costura Lateral Cero (Brutalismo puro) -->
+          <text x="230" y="350" fill="#39FF6A" font-family="Courier New, monospace" font-size="8" transform="rotate(-90 230 350)">[ CERO COSTURAS LATERALES // TUBO CONTINUO ]</text>
+        </svg>
+      </div>
+
+      <div class="flex justify-between items-center font-mono-tech text-[10px] text-[#666] border-t border-[#222] pt-2 relative z-10">
+        <span>ESTADO DEL PATRÓN: CORTADO Y CALIBRADO EN MADRID</span>
+        <span class="text-[var(--amarillo)] font-bold">MATERIAL: FELPA 450 GSM</span>
+      </div>
+    </div>
+
+    <!-- Columna 2: Terminal de Registro Prioritario y Ficha Técnica (5 cols) -->
+    <div class="lg:col-span-5 space-y-6">
+      <!-- Ventana de Registro de Terminal para Acceso Prioritario -->
+      <div class="win95-container p-3 sm:p-4 shadow-[4px_4px_0px_0px_#0A0A0A]">
+        <div class="win95-titlebar text-xs mb-3 flex justify-between items-center">
+          <span>SYS_WAITLIST // TERMINAL_REGISTRATION.EXE</span>
+          <span class="text-[9px]">PRIORITY</span>
+        </div>
+
+        <div class="p-3 bg-[#0A0A0A] border-2 border-[#808080] text-[var(--verde-acido)] font-mono-tech text-xs mb-4">
+          <p class="text-[var(--rojo)] font-bold mb-1">
+            >> ACCESO PRIORITARIO: BATCH 01
+          </p>
+          <p class="text-[#CCC] text-[11px] leading-relaxed mb-3">
+            El primer lote de piezas físicas (Sudadera 450 GSM y Zine Risográfico) se distribuirá por asignación de terminal. Ingrese su dirección para recibir el aviso de desbloqueo antes de la apertura pública.
+          </p>
+
+          <!-- Formulario de Terminal -->
+          <form id="waitlist-form" class="space-y-3">
+            <div>
+              <div class="flex items-center text-xs">
+                <span class="text-[var(--rojo)] font-bold mr-2 select-none">SYS_SUBSCRIBER:/></span>
+                <input 
+                  type="email" 
+                  id="subscriber-email"
+                  class="bg-transparent border-b border-[var(--verde-acido)] outline-none text-[var(--verde-acido)] font-mono-tech w-full text-xs font-bold caret-[var(--verde-acido)] focus:border-[var(--amarillo)] p-1"
+                  placeholder="usuario@dominio.com"
+                  required
+                />
+              </div>
+            </div>
+
+            <div id="waitlist-feedback" class="hidden p-2 bg-[#1A1A1A] border border-[var(--verde-acido)] text-[10px] leading-relaxed">
+              <span class="text-[var(--verde-acido)] font-bold block mb-0.5">>> REGISTRO CONFIRMADO</span>
+              <span class="text-[#BBB]" id="feedback-detail">Terminal registrada en la base forense. Asignado a cola de prioridad BATCH 01.</span>
+            </div>
+
+            <button 
+              type="submit" 
+              id="btn-register-terminal"
+              class="win95-btn font-bold text-xs w-full text-center tracking-wider mt-2"
+            >
+              [ REGISTRAR TERMINAL PARA ACCESO PRIORITARIO ]
+            </button>
+          </form>
+        </div>
+
+        <div class="text-[10px] font-mono-tech text-[#555] flex justify-between">
+          <span>PRIORIDAD: ORDEN CRONOLÓGICO</span>
+          <span>SIN SPAM // SOLO PROTOCOLO</span>
+        </div>
+      </div>
+
+      <!-- Ficha de Especificaciones del Prototipo -->
+      <div class="border-2 border-[var(--negro)] bg-[var(--hueso)] p-5 shadow-[4px_4px_0px_0px_#0A0A0A] font-mono-tech text-xs">
+        <div class="border-b border-[var(--negro)] pb-2 mb-3 flex justify-between items-center font-bold">
+          <span>MEMORIA DEL PROTOTIPO // BATCH 01</span>
+          <span class="text-[var(--rojo)]">STOCK: 000</span>
+        </div>
+
+        <div class="space-y-2 text-[11px]">
+          <div class="flex justify-between border-b border-[var(--concreto)] pb-1">
+            <span class="text-[#666]">TIPO DE PRENDA:</span>
+            <span class="font-bold text-[var(--negro)]">HEAVYWEIGHT SWEATSHIRT</span>
+          </div>
+          <div class="flex justify-between border-b border-[var(--concreto)] pb-1">
+            <span class="text-[#666]">DENSIDAD TEXTIL:</span>
+            <span class="font-bold text-[var(--negro)]">450 GSM (ALTA TENSIÓN)</span>
+          </div>
+          <div class="flex justify-between border-b border-[var(--concreto)] pb-1">
+            <span class="text-[#666]">PATRONAJE:</span>
+            <span class="font-bold text-[var(--negro)]">BOXY CUT // CERO COSTURA LATERAL</span>
+          </div>
+          <div class="flex justify-between border-b border-[var(--concreto)] pb-1">
+            <span class="text-[#666]">ETIQUETA MANGA:</span>
+            <span class="font-bold text-[var(--rojo)]">TEJIDA EN JACQUARD EXTERIOR</span>
+          </div>
+          <div class="flex justify-between border-b border-[var(--concreto)] pb-1">
+            <span class="text-[#666]">REFLECTANTE:</span>
+            <span class="font-bold text-[var(--cian)]">3M RETROFUTURISTA CROMADO</span>
+          </div>
+          <div class="flex justify-between border-b border-[var(--concreto)] pb-1">
+            <span class="text-[#666]">ORIGEN:</span>
+            <span class="font-bold text-[var(--negro)]">CONFECCIÓN EN MADRID</span>
+          </div>
+        </div>
+
+        <div class="mt-4 p-2.5 bg-[var(--concreto)] bg-opacity-30 border border-[var(--negro)] text-[10px] text-[#333] leading-relaxed">
+          <b>NOTA FORENSE:</b> Las prendas no se producirán en serie masiva. Cada unidad se despachará numerada con su coordenada física correspondiente sellada en etiqueta de aluminio.
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  function setupWaitlist() {
+    const form = document.getElementById('waitlist-form');
+    const input = document.getElementById('subscriber-email') as HTMLInputElement;
+    const feedback = document.getElementById('waitlist-feedback');
+    const feedbackDetail = document.getElementById('feedback-detail');
+
+    // URL de conexión con Google Sheets (Google Apps Script Web App)
+    // Coloca aquí tu URL una vez que la crees para que funcione con todos los visitantes del mundo:
+    const DEFAULT_GOOGLE_SHEETS_URL = '';
+    const GOOGLE_SHEETS_URL = localStorage.getItem('yux_google_sheets_webhook') || DEFAULT_GOOGLE_SHEETS_URL;
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = input?.value?.trim();
+      if (!email) return;
+
+      const btn = document.getElementById('btn-register-terminal');
+      if (btn) {
+        btn.textContent = '[ PROCESANDO TRANSMISIÓN... ]';
+        btn.setAttribute('disabled', 'true');
+      }
+
+      // 1. Envío a Google Sheets si está configurada la URL
+      if (GOOGLE_SHEETS_URL) {
+        try {
+          await fetch(GOOGLE_SHEETS_URL, {
+            method: 'POST',
+            mode: 'no-cors', // Google Apps Script requiere no-cors
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email,
+              timestamp: new Date().toISOString(),
+              nodo: 'MADRID_CENTRO',
+              batch: 'BATCH_01_LOCKOUT'
+            })
+          });
+        } catch (err) {
+          console.warn('Error al transmitir a Google Sheets, guardando en respaldo local:', err);
+        }
+      }
+
+      // 2. Respaldo local de seguridad en el navegador
+      const key = 'yux_rmb_waitlist_subscribers';
+      const existing = JSON.parse(localStorage.getItem(key) || '[]');
+      existing.push({ email, timestamp: new Date().toISOString(), synced: !!GOOGLE_SHEETS_URL });
+      localStorage.setItem(key, JSON.stringify(existing));
+
+      // 3. Feedback visual de éxito
+      if (feedback && feedbackDetail) {
+        feedbackDetail.textContent = `Terminal [${email}] registrada con éxito. Prioridad asignada para BATCH 01.`;
+        feedback.classList.remove('hidden');
+      }
+
+      if (input) {
+        input.value = '';
+        input.disabled = true;
+      }
+
+      if (btn) {
+        btn.textContent = '[ REGISTRADO // ESPERANDO BATCH 01 ]';
+        btn.classList.add('opacity-70', 'cursor-not-allowed');
+      }
+    });
+  }
+
+  setupWaitlist();
+  document.addEventListener('astro:page-load', setupWaitlist);
+</script>

@@ -1,0 +1,161 @@
+@import "tailwindcss";
+
+:root {
+  /* Base Neutra Brutalista */
+  --concreto: #B8B3AA;
+  --hueso: #F0EDE6;
+  --negro: #0A0A0A;
+
+  /* Acentos Cálidos (Pigmento) */
+  --rojo: #C41E1E;
+  --amarillo: #FFD100;
+  --verde-acido: #39FF6A;
+  --naranja: #FF6B00;
+
+  /* Acentos Fríos (Holográficos) */
+  --violeta: #8B5CF6;
+  --cian: #4DE8F4;
+  --magenta: #FF3EA5;
+  --navy: #0B0B1F;
+}
+
+@theme {
+  --color-concreto: #B8B3AA;
+  --color-hueso: #F0EDE6;
+  --color-negro: #0A0A0A;
+
+  --color-rojo: #C41E1E;
+  --color-amarillo: #FFD100;
+  --color-verde-acido: #39FF6A;
+  --color-naranja: #FF6B00;
+
+  --color-violeta: #8B5CF6;
+  --color-cian: #4DE8F4;
+  --color-magenta: #FF3EA5;
+  --color-navy: #0B0B1F;
+
+  --font-display: 'Arial Black', Impact, 'Neue Machina', sans-serif;
+  --font-mono-tech: 'Courier New', Courier, monospace;
+  --font-serif-manifesto: Georgia, 'Times New Roman', serif;
+  --font-body-manifesto: Georgia, 'Times New Roman', serif;
+}
+
+/* Reset estructural brutalista */
+*, *::before, *::after {
+  border-radius: 0 !important;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--hueso);
+  color: var(--negro);
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  letter-spacing: -0.02em;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Grano SVG permanente de alta fricción */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.038;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+/* Tipografías Oficiales */
+.font-display {
+  font-family: 'Arial Black', Impact, 'Neue Machina', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  line-height: 0.9;
+}
+
+.font-mono-tech {
+  font-family: 'Courier New', Courier, monospace;
+  letter-spacing: 0.04em;
+}
+
+.font-serif-manifesto, .font-body-manifesto {
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1.6;
+}
+
+/* UI Retrofuturista Windows 95/98 */
+.win95-container, .win95-box {
+  background: #C0C0C0;
+  border: 2px solid #FFFFFF;
+  border-right-color: #0A0A0A;
+  border-bottom-color: #0A0A0A;
+  box-shadow: inset 1px 1px #DFDFDF, inset -1px -1px #808080;
+}
+
+.win95-titlebar {
+  background: #000080;
+  color: #FFFFFF;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  padding: 3px 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.win95-btn {
+  background: #C0C0C0;
+  border: 2px solid #FFFFFF;
+  border-right-color: #0A0A0A;
+  border-bottom-color: #0A0A0A;
+  box-shadow: inset 1px 1px #DFDFDF, inset -1px -1px #808080;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  padding: 4px 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  color: #0A0A0A;
+  text-decoration: none;
+  display: inline-block;
+  user-select: none;
+}
+
+.win95-btn:active {
+  border: 2px solid #0A0A0A;
+  border-right-color: #FFFFFF;
+  border-bottom-color: #FFFFFF;
+  box-shadow: none;
+}
+
+/* Leaflet Custom Overrides para estilo Brutalista/Win95 */
+.leaflet-popup-content-wrapper {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  line-height: inherit !important;
+}
+
+.leaflet-popup-tip-container {
+  display: none !important;
+}
+
+.custom-crosshair {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  cursor: crosshair;
+}
+
+/* Filtro militar de alto contraste para tiles públicas sin API Key */
+.tactical-tiles {
+  filter: grayscale(100%) invert(100%) contrast(140%) brightness(75%) !important;
+}

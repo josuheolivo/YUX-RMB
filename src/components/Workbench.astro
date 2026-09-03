@@ -1,0 +1,1044 @@
+---
+interface Props {
+  existingPieces?: Array<{
+    data: {
+      code: string;
+      title: string;
+      subject: string;
+      coords: string;
+      lat?: number;
+      lng?: number;
+      date_captured?: string;
+      error_message: string;
+      manifest_text: string;
+      grid_version: string;
+      image: string;
+      media_type: string;
+      accent_color: string;
+      status: string;
+    };
+  }>;
+}
+
+const { existingPieces = [] } = Astro.props;
+---
+
+<div id="workbench-root" class="relative">
+  <!-- 1. PANTALLA DE ACCESO PROTEGIDO (VISIBLE POR DEFECTO HASTA INGRESAR CONTRASEÑA) -->
+  <div id="workbench-auth-screen" class="py-12 flex justify-center items-center">
+    <div class="win95-container w-full max-w-md p-2 shadow-[6px_6px_0px_0px_#0A0A0A]">
+      <div class="win95-titlebar text-xs mb-3 flex justify-between items-center">
+        <span>SYS_SECURITY // WORKBENCH_LOCK.EXE</span>
+        <span class="text-[9px] bg-[var(--rojo)] px-1.5 py-0.5 text-white font-bold">RESTRINGIDO</span>
+      </div>
+
+      <div class="p-4 bg-[#D4D0C8] border border-[#808080] border-t-white border-l-white">
+        <div class="flex items-start gap-4 mb-4">
+          <div class="w-10 h-10 bg-[#0A0A0A] text-[var(--rojo)] flex items-center justify-center font-bold text-xl border-2 border-white flex-shrink-0">
+            !
+          </div>
+          <div>
+            <h2 class="font-display text-lg tracking-tight text-[var(--negro)] leading-none mb-1">
+              ACCESO AUTORIZADO EXCLUSIVO
+            </h2>
+            <p class="font-mono-tech text-[11px] text-[#333] leading-tight">
+              Este workbench es de uso exclusivo de administración. Ingrese la clave de protocolo forense para desbloquear los controles del archivo.
+            </p>
+          </div>
+        </div>
+
+        <form id="auth-form" class="space-y-3 font-mono-tech text-xs">
+          <div>
+            <label for="auth-password" class="block font-bold text-[10px] text-[#444] uppercase mb-1">
+              CLAVE DE PROTOCOLO:
+            </label>
+            <input 
+              type="password" 
+              id="auth-password"
+              class="w-full bg-white border-2 border-[var(--negro)] p-2 font-mono-tech outline-none tracking-widest font-bold focus:border-[var(--rojo)]"
+              placeholder="••••••••••••••"
+              autocomplete="current-password"
+              required
+            />
+          </div>
+
+          <div id="auth-error" class="hidden p-2 bg-[#0A0A0A] text-[var(--rojo)] font-bold text-[10px] tracking-wide border border-[var(--rojo)]">
+            >> ACCESO DENEGADO: CLAVE INCORRECTA // INTENTO REGISTRADO
+          </div>
+
+          <div class="flex justify-between items-center pt-2 border-t border-[#BBB]">
+            <a href="/" class="win95-btn text-[10px]">
+              ← CANCELAR
+            </a>
+            <button type="submit" class="win95-btn font-bold text-[11px] text-[var(--negro)]">
+              [ DESBLOQUEAR WORKBENCH ]
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="p-2 text-center text-[10px] font-mono-tech text-[#555]">
+        SEGURIDAD CRIPTOGRÁFICA // SHA-256 HASH VERIFICATION
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. PANEL DE TRABAJO WORKBENCH (DESBLOQUEADO TRAS AUTENTICACIÓN) -->
+  <div id="workbench-main-content" class="hidden space-y-6">
+    <!-- Barra Superior de Control de Sesión -->
+    <div class="win95-container p-2 flex flex-wrap justify-between items-center gap-3 shadow-[3px_3px_0px_0px_#0A0A0A]">
+      <div class="flex items-center gap-3 font-mono-tech text-xs">
+        <span class="inline-block w-2.5 h-2.5 bg-[var(--verde-acido)] animate-pulse"></span>
+        <span class="font-bold text-[var(--negro)]">SESIÓN AUTORIZADA // JOSUHE RMB</span>
+        <span class="text-[#666] hidden sm:inline">| NÚCLEO: V2.0 PRODUCTION</span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <a href="/admin" target="_blank" class="win95-btn text-[10px] font-bold">
+          [ ABRIR PANEL DECAP CMS ↗ ]
+        </a>
+        <button id="btn-logout" class="win95-btn text-[10px] text-[var(--rojo)] font-bold">
+          [ BLOQUEAR / SALIR ]
+        </button>
+      </div>
+    </div>
+
+    <!-- Navegación interna de pestañas -->
+    <div class="flex border-b-2 border-[var(--negro)] bg-[var(--hueso)] font-mono-tech text-xs font-bold uppercase overflow-x-auto">
+      <button id="tab-btn-editor" class="p-3 border-r-2 border-[var(--negro)] bg-[var(--negro)] text-[var(--hueso)] cursor-pointer">
+        01. GENERADOR & PREVIEW
+      </button>
+      <button id="tab-btn-files" class="p-3 border-r-2 border-[var(--negro)] bg-[var(--hueso)] text-[var(--negro)] hover:bg-[var(--concreto)] cursor-pointer">
+        02. GESTOR DE ARCHIVOS (.MD + .JPG)
+      </button>
+      <button id="tab-btn-catalog" class="p-3 border-r-2 border-[var(--negro)] bg-[var(--hueso)] text-[var(--negro)] hover:bg-[var(--concreto)] cursor-pointer">
+        03. EXPEDIENTES ({existingPieces.length})
+      </button>
+      <button id="tab-btn-waitlist" class="p-3 bg-[var(--hueso)] text-[var(--negro)] hover:bg-[var(--concreto)] cursor-pointer">
+        04. LISTA PRIORITARIA & GOOGLE SHEETS
+      </button>
+    </div>
+
+    <!-- PESTAÑA 01: GENERADOR & PREVIEW -->
+    <div id="tab-content-editor" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <!-- Columna Formulario (7 cols) -->
+      <div class="lg:col-span-7 bg-[var(--hueso)] border-2 border-[var(--negro)] p-5 sm:p-6 shadow-[4px_4px_0px_0px_#0A0A0A]">
+        <div class="border-b-2 border-[var(--negro)] pb-3 mb-6 flex justify-between items-center">
+          <h2 class="font-display text-2xl uppercase tracking-tighter">PARÁMETROS DE EXPEDIENTE</h2>
+          <span class="font-mono-tech text-xs bg-[var(--negro)] text-[var(--hueso)] px-2 py-0.5 font-bold">RMB-V2.0</span>
+        </div>
+
+        <form id="workbench-form" class="space-y-4 font-mono-tech text-xs">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block font-bold mb-1 uppercase text-[#555]">CÓDIGO (3 Dígitos)*</label>
+              <input 
+                type="text" 
+                id="field-code" 
+                value="009" 
+                class="w-full bg-[var(--concreto)] bg-opacity-30 border border-[var(--negro)] p-2 font-mono-tech focus:bg-white outline-none"
+                placeholder="009"
+                required
+              />
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block font-bold mb-1 uppercase text-[#555]">TÍTULO (SUJETO // FALLO)*</label>
+              <input 
+                type="text" 
+                id="field-title" 
+                value="TORRE // DESINC" 
+                class="w-full bg-[var(--concreto)] bg-opacity-30 border border-[var(--negro)] p-2 font-mono-tech focus:bg-white outline-none font-bold"
+                placeholder="TORRE // DESINC"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block font-bold mb-1 uppercase text-[#555]">SUJETO / EDIFICIO*</label>
+              <input 
+                type="text" 
+                id="field-subject" 
+                value="Torres de Colón, Madrid" 
+                class="w-full bg-[var(--concreto)] bg-opacity-30 border border-[var(--negro)] p-2 font-mono-tech focus:bg-white outline-none"
+                placeholder="Torres de Colón, Madrid"
+                required
+              />
+            </div>
+            <div>
+              <label class="block font-bold mb-1 uppercase text-[#555]">FECHA CAPTURA (YYYY-MM-DD)</label>
+              <input 
+                type="text" 
+                id="field-date" 
+                value="2024-05-18" 
+                class="w-full bg-[var(--concreto)] bg-opacity-30 border border-[var(--negro)] p-2 font-mono-tech focus:bg-white outline-none"
+                placeholder="2024-05-18"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-bold mb-1 uppercase text-[#555]">COORDENADAS GPS (FORMATO FORENSE)*</label>
+            <input 
+              type="text" 
+              id="field-coords" 
+              value="40°25'31.10\"N 3°41'27.50\"O (Plaza de Colón)" 
+              class="w-full bg-[var(--concreto)] bg-opacity-30 border border-[var(--negro)] p-2 font-mono-tech focus:bg-white outline-none"
+              placeholder="40°25'31.10\"N 3°41'27.50\"O"
+              required
+            />
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block font-bold mb-1 uppercase text-[#555]">LATITUD MAPA (DECIMAL)</label>
+              <input 
+                type="number" 
+                step="0.00001" 
+                id="field-lat" 
+                value="40.42530" 
+                class="w-full bg-[var(--concreto)] bg-opacity-30 border border-[var(--negro)] p-2 font-mono-tech focus:bg-white outline-none"
+                placeholder="40.42530"
+              />
+            </div>
+            <div>
+              <label class="block font-bold mb-1 uppercase text-[#555]">LONGITUD MAPA (DECIMAL)</label>
+              <input 
+                type="number" 
+                step="0.00001" 
+                id="field-lng" 
+                value="-3.69090" 
+                class="w-full bg-[var(--concreto)] bg-opacity-30 border border-[var(--negro)] p-2 font-mono-tech focus:bg-white outline-none"
+                placeholder="-3.69090"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-bold mb-1 uppercase text-[#555]">MENSAJE DE ERROR FORENSE*</label>
+            <input 
+              type="text" 
+              id="field-error" 
+              value="CRITICAL_FAULT: SUSPENSION_STRUCTURE_CORRUPTED" 
+              class="w-full bg-[var(--concreto)] bg-opacity-30 border border-[var(--negro)] p-2 font-mono-tech focus:bg-white outline-none text-[var(--rojo)] font-bold"
+              placeholder="SYS_ERROR: ..."
+              required
+            />
+          </div>
+
+          <div>
+            <label class="block font-bold mb-1 uppercase text-[#555]">TEXTO / MANIFIESTO FORENSE*</label>
+            <textarea 
+              id="field-manifest" 
+              rows="3" 
+              class="w-full bg-[var(--concreto)] bg-opacity-30 border border-[var(--negro)] p-2 font-serif-manifesto focus:bg-white outline-none leading-relaxed text-sm"
+              placeholder="El sistema intentó calcular el peso suspendido..."
+              required
+            >El sistema intentó calcular la tensión de los cables que sostienen el hormigón. La gravedad no entraba en el presupuesto original del monitoreo. El error no es la caída: es asumir que una estructura suspendida en el aire puede mantenerse quieta para siempre.</textarea>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block font-bold mb-1 uppercase text-[#555]">ACENTO CROMÁTICO</label>
+              <div class="flex items-center gap-2">
+                <input 
+                  type="color" 
+                  id="field-accent-picker" 
+                  value="#4DE8F4" 
+                  class="w-8 h-8 border border-black p-0 cursor-pointer"
+                />
+                <input 
+                  type="text" 
+                  id="field-accent" 
+                  value="#4DE8F4" 
+                  class="flex-1 bg-[var(--concreto)] bg-opacity-30 border border-[var(--negro)] p-2 font-mono-tech uppercase font-bold"
+                />
+              </div>
+            </div>
+            <div>
+              <label class="block font-bold mb-1 uppercase text-[#555]">TIPO MEDIO</label>
+              <select id="field-media-type" class="w-full bg-[var(--concreto)] bg-opacity-30 border border-[var(--negro)] p-2 font-mono-tech">
+                <option value="image">IMAGE (.JPG)</option>
+                <option value="video">VIDEO (.MP4)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-bold mb-1 uppercase text-[#555]">ESTADO NODO</label>
+              <select id="field-status" class="w-full bg-[var(--concreto)] bg-opacity-30 border border-[var(--negro)] p-2 font-mono-tech">
+                <option value="CORRUPTED">CORRUPTED</option>
+                <option value="SYSTEM_FAIL">SYSTEM_FAIL</option>
+                <option value="ARCHIVED">ARCHIVED</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Columna Live Preview y Exportación (5 cols) -->
+      <div class="lg:col-span-5 space-y-6">
+        <!-- Live Preview Card -->
+        <div class="border-2 border-[var(--negro)] bg-[var(--hueso)] p-4 shadow-[4px_4px_0px_0px_#0A0A0A]">
+          <div class="font-mono-tech text-xs font-bold uppercase mb-3 flex justify-between items-center border-b border-[var(--negro)] pb-2">
+            <span>PREVISUALIZADOR // RATIO 3:4</span>
+            <span id="preview-status-badge" class="text-[var(--rojo)] text-[10px]">PREVIEW EN VIVO</span>
+          </div>
+
+          <div class="max-w-[320px] mx-auto">
+            <article 
+              id="preview-card" 
+              class="card-rmb group flex flex-col bg-[var(--hueso)] border-2 border-[var(--negro)] relative overflow-hidden" 
+              style="--card-accent: #4DE8F4;"
+            >
+              <div class="card-media relative aspect-[3/4] bg-[var(--concreto)] overflow-hidden border-b-2 border-[var(--negro)]">
+                <span id="preview-card-code-badge" class="absolute top-2 left-2 z-10 bg-[var(--negro)] text-[var(--hueso)] font-mono-tech text-xs px-2 py-0.5">
+                  #009
+                </span>
+                <span id="preview-card-status-badge" class="absolute top-2 right-2 z-10 bg-[var(--negro)] text-[var(--card-accent)] font-mono-tech text-[9px] px-1.5 py-0.5 font-bold border border-[#333]">
+                  [CORRUPTED]
+                </span>
+
+                <!-- Imagen simulada o subida -->
+                <div id="preview-media-container" class="w-full h-full flex flex-col items-center justify-center bg-[#151515] text-[var(--hueso)] p-4 text-center overflow-hidden">
+                  <img id="preview-uploaded-image" class="hidden w-full h-full object-cover filter contrast-105" alt="Preview" />
+                  <div id="preview-fallback-text" class="flex flex-col items-center">
+                    <span class="font-mono-tech text-xs text-[#888] mb-1">[MEDIA CONTAINER]</span>
+                    <span id="preview-card-media-label" class="font-mono-tech text-sm font-bold text-[var(--card-accent)]">009.jpg</span>
+                    <div class="mt-3 text-[9px] font-mono-tech text-[#666] border border-[#333] p-1.5">
+                      SUBE TU IMAGEN EN LA PESTAÑA 02
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Overlay de Glitch cromático en Hover -->
+                <div class="absolute inset-0 opacity-0 group-hover:opacity-30 pointer-events-none mix-blend-color-dodge transition-opacity duration-75" style="background-color: var(--card-accent);"></div>
+              </div>
+
+              <div class="p-4 flex-1 flex flex-col justify-between bg-[var(--hueso)]">
+                <div>
+                  <p id="preview-card-error" class="font-mono-tech text-xs uppercase mb-1 tracking-wider font-bold" style="color: var(--card-accent);">
+                    CRITICAL_FAULT: SUSPENSION_STRUCTURE_CORRUPTED
+                  </p>
+                  <h3 id="preview-card-title" class="font-display text-2xl tracking-tighter leading-none mb-1 text-[var(--negro)]">
+                    TORRE // DESINC
+                  </h3>
+                  <p id="preview-card-subject" class="text-xs italic text-[#444] mb-1">Torres de Colón, Madrid</p>
+                  <p id="preview-card-coords" class="font-mono-tech text-[10px] text-[#555] mb-2">40°25'31.10"N 3°41'27.50"O</p>
+                  <p id="preview-card-text" class="text-xs font-serif-manifesto leading-relaxed text-[#111] line-clamp-3 mb-3">
+                    El sistema intentó calcular la tensión de los cables que sostienen el hormigón...
+                  </p>
+                </div>
+
+                <div class="font-mono-tech text-[9px] text-[#888] border-t border-[#CCC] pt-2 flex justify-between">
+                  <span>GRID: RMB-V1.2</span>
+                  <span class="font-bold uppercase underline">[VER EVIDENCIA]</span>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <!-- Exportador Markdown -->
+        <div class="win95-container p-3 shadow-[4px_4px_0px_0px_#0A0A0A]">
+          <div class="win95-titlebar text-xs mb-2">
+            <span id="md-filename-label">GENERADOR_OUTPUT // 009.MD</span>
+            <span class="text-[9px]">UTF-8</span>
+          </div>
+          <div class="bg-[#0A0A0A] p-3 text-[var(--verde-acido)] font-mono-tech text-[11px] overflow-x-auto max-h-40 scrollbar-thin">
+            <pre id="output-markdown" class="whitespace-pre"></pre>
+          </div>
+          <div class="mt-3 flex flex-wrap justify-between items-center gap-2">
+            <span id="md-copied-toast" class="font-mono-tech text-xs text-[var(--rojo)] font-bold opacity-0 transition-opacity duration-75">¡COPIADO AL PORTAPAPELES!</span>
+            <div class="flex gap-2">
+              <button id="btn-copy-md" class="win95-btn font-bold text-xs">
+                [ COPIAR TEXTO ]
+              </button>
+              <button id="btn-download-md" class="win95-btn font-bold text-xs">
+                [ DESCARGAR .MD ]
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exportador Instagram Caption -->
+        <div class="win95-container p-3 shadow-[4px_4px_0px_0px_#0A0A0A]">
+          <div class="win95-titlebar text-xs mb-2">
+            <span>INSTAGRAM_CAPTION // YUX_OFFICIAL</span>
+            <span class="text-[9px]">META-FORMAT</span>
+          </div>
+          <div class="bg-white p-3 text-[#111] font-mono-tech text-[11px] border border-[#888] overflow-x-auto max-h-36 scrollbar-thin">
+            <pre id="output-caption" class="whitespace-pre-wrap font-mono-tech"></pre>
+          </div>
+          <div class="mt-3 flex justify-between items-center">
+            <span id="caption-copied-toast" class="font-mono-tech text-xs text-[var(--rojo)] font-bold opacity-0 transition-opacity duration-75">¡CAPTION COPIADO!</span>
+            <button id="btn-copy-caption" class="win95-btn font-bold text-xs">
+              [ COPIAR CAPTION ]
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 02: GESTOR DE ARCHIVOS (.MD + .JPG) -->
+    <div id="tab-content-files" class="hidden space-y-6">
+      <div class="bg-[var(--hueso)] border-2 border-[var(--negro)] p-6 shadow-[4px_4px_0px_0px_#0A0A0A]">
+        <div class="border-b-2 border-[var(--negro)] pb-3 mb-6 flex justify-between items-center">
+          <div>
+            <h3 class="font-display text-2xl uppercase tracking-tighter">SUBIDA Y PREPARACIÓN DE RECURSOS</h3>
+            <p class="font-mono-tech text-xs text-[#555]">Carga la imagen de la pieza para previsualizarla y preparar los archivos para el repositorio.</p>
+          </div>
+          <span class="font-mono-tech text-xs bg-[var(--rojo)] text-white px-2 py-0.5 font-bold">PIPELINE ACTIVO</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+          <!-- Dropzone de Imagen -->
+          <div class="border-2 border-dashed border-[var(--negro)] p-6 bg-[#FAFAFA] text-center flex flex-col items-center justify-center min-h-[260px] relative cursor-pointer hover:bg-[#F0F0F0] transition-colors duration-75">
+            <input type="file" id="image-file-input" accept="image/jpeg,image/png,image/webp" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
+            <div class="w-12 h-12 bg-[var(--negro)] text-[var(--hueso)] flex items-center justify-center font-bold text-xl mb-3">
+              +
+            </div>
+            <p class="font-mono-tech text-xs font-bold uppercase mb-1">
+              ARRASTRA AQUÍ LA IMAGEN FUENTE O HAZ CLICK
+            </p>
+            <p class="font-mono-tech text-[10px] text-[#777] mb-3">
+              FORMATOS PERMITIDOS: JPEG, PNG, WEBP // LADO LARGO MÁX: ~1300PX
+            </p>
+            <div id="file-info-badge" class="font-mono-tech text-[10px] bg-[var(--concreto)] text-[var(--negro)] px-2 py-1 font-bold">
+              SIN ARCHIVO SELECCIONADO
+            </div>
+          </div>
+
+          <!-- Acciones de Publicación -->
+          <div class="win95-container p-4 space-y-4">
+            <div class="win95-titlebar text-xs">
+              <span>ACCIONES_EXPEDIENTE // INSTRUCCIONES</span>
+            </div>
+            <div class="font-mono-tech text-xs text-[#222] space-y-2 leading-relaxed">
+              <p class="font-bold text-[var(--rojo)]">CÓMO PUBLICAR ESTA PIEZA EN PRODUCCIÓN:</p>
+              <ol class="list-decimal pl-5 space-y-1 text-[11px]">
+                <li><b>Opción A (Recomendada - Directa):</b> Abre el <b><a href="/admin" target="_blank" class="underline font-bold text-[var(--rojo)]">Panel Decap CMS</a></b>. Al estar autenticado en GitHub/Netlify, puedes rellenar estos campos y subir la imagen directamente desde el navegador haciendo el commit automático.</li>
+                <li><b>Opción B (Local / Git Manual):</b>
+                  <div class="mt-2 flex flex-col gap-2">
+                    <button id="btn-bundle-md" class="win95-btn text-[11px] font-bold text-left">
+                      💾 1. Descargar archivo <span id="download-md-label">009.md</span> → colocar en <code class="bg-[#eee] px-1">src/content/piezas/</code>
+                    </button>
+                    <button id="btn-bundle-img" class="win95-btn text-[11px] font-bold text-left" disabled>
+                      🖼️ 2. Descargar imagen <span id="download-img-label">009.jpg</span> → colocar en <code class="bg-[#eee] px-1">src/assets/</code>
+                    </button>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 03: EXPEDIENTES EXISTENTES -->
+    <div id="tab-content-catalog" class="hidden space-y-4">
+      <div class="bg-[var(--hueso)] border-2 border-[var(--negro)] p-6 shadow-[4px_4px_0px_0px_#0A0A0A]">
+        <div class="border-b-2 border-[var(--negro)] pb-3 mb-4 flex justify-between items-center">
+          <h3 class="font-display text-2xl uppercase tracking-tighter">CATÁLOGO CENTRAL EN MEMORIA</h3>
+          <span class="font-mono-tech text-xs text-[#666]">SELECCIONA UN EXPEDIENTE PARA CARGAR SUS PARÁMETROS</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 font-mono-tech text-xs">
+          {existingPieces.map((p) => (
+            <div class="border border-[var(--negro)] bg-white p-3 flex flex-col justify-between hover:shadow-[3px_3px_0px_0px_#0A0A0A] transition-shadow duration-75">
+              <div>
+                <div class="flex justify-between items-center text-[10px] mb-1">
+                  <span class="font-bold">#{p.data.code}</span>
+                  <span class="w-2.5 h-2.5 border border-black" style={`background-color: ${p.data.accent_color};`}></span>
+                </div>
+                <p class="font-display text-base tracking-tight leading-tight mb-1 text-[var(--negro)]">
+                  {p.data.title}
+                </p>
+                <p class="text-[10px] text-[#666] truncate mb-2">
+                  {p.data.subject}
+                </p>
+              </div>
+              <button 
+                class="win95-btn text-[10px] font-bold text-center w-full btn-load-piece"
+                data-piece={JSON.stringify(p.data)}
+              >
+                [ CARGAR EN EDITOR ]
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 04: LISTA PRIORITARIA & GOOGLE SHEETS -->
+    <div id="tab-content-waitlist" class="hidden space-y-6">
+      <div class="bg-[var(--hueso)] border-2 border-[var(--negro)] p-6 shadow-[4px_4px_0px_0px_#0A0A0A]">
+        <div class="border-b-2 border-[var(--negro)] pb-3 mb-6 flex flex-wrap justify-between items-center gap-2">
+          <div>
+            <h3 class="font-display text-2xl uppercase tracking-tighter">SINCRONIZACIÓN CON GOOGLE SHEETS</h3>
+            <p class="font-mono-tech text-xs text-[#555]">Conecta la terminal de /suministros directamente a tu hoja de cálculo para recibir los registros en tiempo real.</p>
+          </div>
+          <span class="font-mono-tech text-xs bg-[var(--verde-acido)] text-[var(--negro)] px-2 py-0.5 font-bold">100% GRATIS // SIN SERVIDOR</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <!-- Configuración de URL -->
+          <div class="lg:col-span-7 space-y-4">
+            <div class="win95-container p-4">
+              <div class="win95-titlebar text-xs mb-3">
+                <span>CONFIGURACIÓN // GOOGLE_APPS_SCRIPT_WEBHOOK</span>
+              </div>
+              
+              <div class="font-mono-tech text-xs space-y-3">
+                <label class="block font-bold text-[var(--negro)]">
+                  URL DE TU APLICACIÓN WEB DE GOOGLE SHEETS:
+                </label>
+                <input 
+                  type="url" 
+                  id="sheets-webhook-input"
+                  class="w-full bg-white border border-[var(--negro)] p-2 font-mono-tech text-xs font-bold outline-none"
+                  placeholder="https://script.google.com/macros/s/AKfycb.../exec"
+                />
+
+                <div class="flex flex-wrap gap-2 pt-2">
+                  <button id="btn-save-webhook" class="win95-btn font-bold text-xs">
+                    [ GUARDAR CONEXIÓN ]
+                  </button>
+                  <button id="btn-test-webhook" class="win95-btn text-xs">
+                    [ ENVIAR TRANSMISIÓN DE PRUEBA ]
+                  </button>
+                </div>
+                <div id="webhook-toast" class="hidden font-bold text-[10px] p-2 bg-[#0A0A0A] text-[var(--verde-acido)] border border-[var(--verde-acido)]"></div>
+              </div>
+            </div>
+
+            <!-- Terminales Registradas Localmente -->
+            <div class="border-2 border-[var(--negro)] p-4 bg-white font-mono-tech text-xs">
+              <div class="border-b border-[var(--negro)] pb-2 mb-3 flex justify-between items-center font-bold">
+                <span id="subscribers-count-label">REGISTROS CAPTURADOS (0)</span>
+                <button id="btn-export-csv" class="win95-btn text-[10px] font-bold">
+                  [ EXPORTAR CSV ]
+                </button>
+              </div>
+
+              <div id="local-subscribers-list" class="max-h-48 overflow-y-auto space-y-1 text-[11px] text-[#333]">
+                <!-- Lista inyectada por JS -->
+              </div>
+            </div>
+
+            <!-- Solicitudes de Logotipo Vectorial (.SVG) -->
+            <div class="border-2 border-[var(--negro)] p-4 bg-white font-mono-tech text-xs">
+              <div class="border-b border-[var(--negro)] pb-2 mb-3 flex justify-between items-center font-bold">
+                <span id="logo-requests-count-label" class="text-[var(--rojo)] font-bold">SOLICITUDES DE LOGO .SVG (0)</span>
+                <button id="btn-export-logo-requests-csv" class="win95-btn text-[10px] font-bold text-[var(--rojo)]">
+                  [ EXPORTAR CSV SOLICITUDES ]
+                </button>
+              </div>
+
+              <div id="local-logo-requests-list" class="max-h-56 overflow-y-auto space-y-2 text-[11px] text-[#333]">
+                <!-- Lista inyectada por JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Instrucciones de 3 Pasos -->
+          <div class="lg:col-span-5 win95-container p-4">
+            <div class="win95-titlebar text-xs mb-3">
+              <span>GUÍA_RÁPIDA // CÓMO CREAR TU HOJA EN 2 MINUTOS</span>
+            </div>
+            <div class="font-mono-tech text-xs space-y-3 text-[#222] leading-relaxed">
+              <p><b>Paso 1:</b> Crea una hoja nueva en <b>Google Sheets</b> llamada <i>YUX RMB Waitlist</i>.</p>
+              <p><b>Paso 2:</b> En el menú superior haz clic en <b>Extensiones → Apps Script</b>, borra el código que haya y pega este:</p>
+              <div class="bg-[#0A0A0A] text-[var(--verde-acido)] p-2 text-[10px] overflow-x-auto max-h-36 scrollbar-thin font-mono-tech">
+                <pre class="whitespace-pre">function doPost(e) &#123;
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var data = JSON.parse(e.postData.contents);
+  sheet.appendRow([new Date(), data.email, data.nodo, data.batch]);
+  return ContentService.createTextOutput(JSON.stringify(&#123; status: "OK" &#125;))
+    .setMimeType(ContentService.MimeType.JSON);
+&#125;</pre>
+              </div>
+              <p><b>Paso 3:</b> Arriba a la derecha dale a <b>Implementar → Nueva implementación</b>. Selecciona tipo <b>Aplicación web</b>, en "¿Quién tiene acceso?" elige <b>Cualquier persona</b> y dale a Implementar. Copia la URL que termina en <code class="bg-[#ddd] px-1">/exec</code> y pégala aquí a la izquierda.</p>
+              <p class="text-[var(--rojo)] font-bold text-[10px] pt-2 border-t border-[#AAA]">
+                ¡Listo! A partir de ese momento, cada visitante que registre su correo en /suministros aparecerá de inmediato en una nueva fila de tu Google Sheet.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // HASH SHA-256 de la contraseña "Adrijosu1213*."
+  const AUTH_HASH = "08321f3ec31545ae9af10c4f8deb49edd6cd5870927ab7740139015a814a179f";
+  const STORAGE_KEY = "yux_workbench_authenticated_session";
+
+  async function computeSha256(str: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(str);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  function initWorkbenchSecurity() {
+    const authScreen = document.getElementById("workbench-auth-screen");
+    const mainContent = document.getElementById("workbench-main-content");
+    const authForm = document.getElementById("auth-form") as HTMLFormElement;
+    const passwordInput = document.getElementById("auth-password") as HTMLInputElement;
+    const authError = document.getElementById("auth-error");
+    const btnLogout = document.getElementById("btn-logout");
+
+    // Verificar si ya existe sesión válida
+    const savedHash = sessionStorage.getItem(STORAGE_KEY);
+    if (savedHash === AUTH_HASH) {
+      unlockWorkbench();
+    }
+
+    function unlockWorkbench() {
+      authScreen?.classList.add("hidden");
+      mainContent?.classList.remove("hidden");
+    }
+
+    function lockWorkbench() {
+      sessionStorage.removeItem(STORAGE_KEY);
+      mainContent?.classList.add("hidden");
+      authScreen?.classList.remove("hidden");
+      if (passwordInput) passwordInput.value = "";
+      authError?.classList.add("hidden");
+    }
+
+    authForm?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const enteredPassword = passwordInput.value;
+      const computed = await computeSha256(enteredPassword);
+
+      if (computed === AUTH_HASH) {
+        sessionStorage.setItem(STORAGE_KEY, AUTH_HASH);
+        authError?.classList.add("hidden");
+        unlockWorkbench();
+      } else {
+        authError?.classList.remove("hidden");
+        passwordInput.value = "";
+        passwordInput.focus();
+      }
+    });
+
+    btnLogout?.addEventListener("click", () => {
+      lockWorkbench();
+    });
+
+    // Pestañas
+    const tabBtnEditor = document.getElementById("tab-btn-editor");
+    const tabBtnFiles = document.getElementById("tab-btn-files");
+    const tabBtnCatalog = document.getElementById("tab-btn-catalog");
+    const tabBtnWaitlist = document.getElementById("tab-btn-waitlist");
+
+    const tabContentEditor = document.getElementById("tab-content-editor");
+    const tabContentFiles = document.getElementById("tab-content-files");
+    const tabContentCatalog = document.getElementById("tab-content-catalog");
+    const tabContentWaitlist = document.getElementById("tab-content-waitlist");
+
+    function setActiveTab(tab: "editor" | "files" | "catalog" | "waitlist") {
+      // Buttons
+      tabBtnEditor?.classList.toggle("bg-[var(--negro)]", tab === "editor");
+      tabBtnEditor?.classList.toggle("text-[var(--hueso)]", tab === "editor");
+      tabBtnEditor?.classList.toggle("bg-[var(--hueso)]", tab !== "editor");
+      tabBtnEditor?.classList.toggle("text-[var(--negro)]", tab !== "editor");
+
+      tabBtnFiles?.classList.toggle("bg-[var(--negro)]", tab === "files");
+      tabBtnFiles?.classList.toggle("text-[var(--hueso)]", tab === "files");
+      tabBtnFiles?.classList.toggle("bg-[var(--hueso)]", tab !== "files");
+      tabBtnFiles?.classList.toggle("text-[var(--negro)]", tab !== "files");
+
+      tabBtnCatalog?.classList.toggle("bg-[var(--negro)]", tab === "catalog");
+      tabBtnCatalog?.classList.toggle("text-[var(--hueso)]", tab === "catalog");
+      tabBtnCatalog?.classList.toggle("bg-[var(--hueso)]", tab !== "catalog");
+      tabBtnCatalog?.classList.toggle("text-[var(--negro)]", tab !== "catalog");
+
+      tabBtnWaitlist?.classList.toggle("bg-[var(--negro)]", tab === "waitlist");
+      tabBtnWaitlist?.classList.toggle("text-[var(--hueso)]", tab === "waitlist");
+      tabBtnWaitlist?.classList.toggle("bg-[var(--hueso)]", tab !== "waitlist");
+      tabBtnWaitlist?.classList.toggle("text-[var(--negro)]", tab !== "waitlist");
+
+      // Contents
+      tabContentEditor?.classList.toggle("hidden", tab !== "editor");
+      tabContentFiles?.classList.toggle("hidden", tab !== "files");
+      tabContentCatalog?.classList.toggle("hidden", tab !== "catalog");
+      tabContentWaitlist?.classList.toggle("hidden", tab !== "waitlist");
+
+      if (tab === "waitlist") {
+        renderLocalSubscribers();
+      }
+    }
+
+    tabBtnEditor?.addEventListener("click", () => setActiveTab("editor"));
+    tabBtnFiles?.addEventListener("click", () => setActiveTab("files"));
+    tabBtnCatalog?.addEventListener("click", () => setActiveTab("catalog"));
+    tabBtnWaitlist?.addEventListener("click", () => setActiveTab("waitlist"));
+
+    // Lógica de Google Sheets Webhook y Lista Local
+    const webhookInput = document.getElementById("sheets-webhook-input") as HTMLInputElement;
+    const btnSaveWebhook = document.getElementById("btn-save-webhook");
+    const btnTestWebhook = document.getElementById("btn-test-webhook");
+    const webhookToast = document.getElementById("webhook-toast");
+    const btnExportCsv = document.getElementById("btn-export-csv");
+    const subscribersList = document.getElementById("local-subscribers-list");
+    const subscribersCountLabel = document.getElementById("subscribers-count-label");
+
+    const WEBHOOK_KEY = "yux_google_sheets_webhook";
+    const SUBSCRIBERS_KEY = "yux_rmb_waitlist_subscribers";
+
+    // Cargar webhook guardado
+    if (webhookInput) {
+      webhookInput.value = localStorage.getItem(WEBHOOK_KEY) || "";
+    }
+
+    btnSaveWebhook?.addEventListener("click", () => {
+      const url = webhookInput?.value?.trim() || "";
+      localStorage.setItem(WEBHOOK_KEY, url);
+      if (webhookToast) {
+        webhookToast.textContent = url ? ">> CONEXIÓN GUARDADA // TERMINAL VINCULADA" : ">> URL ELIMINADA // MODO LOCAL ACTIVO";
+        webhookToast.classList.remove("hidden");
+        setTimeout(() => webhookToast.classList.add("hidden"), 3000);
+      }
+    });
+
+    btnTestWebhook?.addEventListener("click", async () => {
+      const url = webhookInput?.value?.trim();
+      if (!url) {
+        alert("Por favor ingrese primero la URL de Google Apps Script.");
+        return;
+      }
+      try {
+        if (btnTestWebhook) btnTestWebhook.textContent = "[ TRANSMITIENDO TEST... ]";
+        await fetch(url, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: "test.terminal@yux-rmb.com",
+            timestamp: new Date().toISOString(),
+            nodo: "TEST_CONEXION_WORKBENCH",
+            batch: "VERIFICACION"
+          })
+        });
+        if (webhookToast) {
+          webhookToast.textContent = ">> TRANSMISIÓN ENVIADA A GOOGLE SHEETS // REVISA TU HOJA";
+          webhookToast.classList.remove("hidden");
+          setTimeout(() => webhookToast.classList.add("hidden"), 4000);
+        }
+      } catch (err: any) {
+        alert("Error al contactar con la URL: " + err.message);
+      } finally {
+        if (btnTestWebhook) btnTestWebhook.textContent = "[ ENVIAR TRANSMISIÓN DE PRUEBA ]";
+      }
+    });
+
+    function renderLocalSubscribers() {
+      const subs = JSON.parse(localStorage.getItem(SUBSCRIBERS_KEY) || "[]");
+      if (subscribersCountLabel) {
+        subscribersCountLabel.textContent = `REGISTROS CAPTURADOS (${subs.length})`;
+      }
+      if (subscribersList) {
+        if (subs.length === 0) {
+          subscribersList.innerHTML = `<div class="text-[#888] italic py-2">No hay registros locales aún. Los correos ingresados en /suministros se listarán aquí.</div>`;
+        } else {
+          subscribersList.innerHTML = subs.map((s: any, idx: number) => `
+            <div class="flex justify-between items-center py-1 border-b border-[#eee]">
+              <span class="font-bold">#${(idx + 1).toString().padStart(2, "0")} ${typeof s === "string" ? s : s.email}</span>
+              <span class="text-[9px] text-[#888]">${typeof s === "object" && s.timestamp ? s.timestamp.substring(0, 10) : "RECIENTE"}</span>
+            </div>
+          `).reverse().join("");
+        }
+      }
+
+      // Renderizar solicitudes de logo vectorial recibidas en /assets
+      const logoReqs = JSON.parse(localStorage.getItem('yux_rmb_logo_requests') || '[]');
+      const logoCountLabel = document.getElementById('logo-requests-count-label');
+      const logoList = document.getElementById('local-logo-requests-list');
+      if (logoCountLabel) {
+        logoCountLabel.textContent = `SOLICITUDES DE LOGO .SVG (${logoReqs.length})`;
+      }
+      if (logoList) {
+        if (logoReqs.length === 0) {
+          logoList.innerHTML = `<div class="text-[#888] italic py-2">No hay solicitudes de logotipo aún. Los pedidos recibidos en /assets se registrarán aquí con su justificación.</div>`;
+        } else {
+          logoList.innerHTML = logoReqs.map((r: any, idx: number) => `
+            <div class="p-2 border border-[#ddd] bg-[#fdfdfd] space-y-1">
+              <div class="flex justify-between items-center text-[10px]">
+                <span class="font-bold text-[var(--rojo)]">#${(idx + 1).toString().padStart(2, '0')} ${r.email}</span>
+                <span class="text-[#888]">${r.timestamp ? r.timestamp.substring(0, 10) : 'RECIENTE'}</span>
+              </div>
+              <div class="text-[10px] text-[#444]">
+                <b>SOLICITANTE:</b> ${r.name || 'NO ESPECIFICADO'}
+              </div>
+              <div class="text-[10px] bg-[#eee] p-1.5 border-l-2 border-[var(--rojo)] leading-tight text-[#222]">
+                <b>MOTIVO:</b> "${r.reason}"
+              </div>
+              <div class="pt-1 flex justify-end">
+                <a href="mailto:${r.email}?subject=YUX%20//%20Isotipo%20Vectorial%20Oficial&body=Hola%20${encodeURIComponent(r.name || '')},%0A%0AEn%20relaci%C3%B3n%20a%20tu%20solicitud%20del%20logotipo%20vectorial%20de%20YUX%20RMB%20para:%0A%22${encodeURIComponent(r.reason || '')}%22,%0A%0AAdjunto%20te%20remito%20el%20archivo%20vectorial%20maestro%20.SVG.%0A%0ASaludos,%0AJosuhe%20//%20YUX%20RMB" class="win95-btn text-[9px] font-bold">
+                  [ ENVIAR LOGO VÍA EMAIL ]
+                </a>
+              </div>
+            </div>
+          `).reverse().join('');
+        }
+      }
+    }
+
+    btnExportCsv?.addEventListener("click", () => {
+      const subs = JSON.parse(localStorage.getItem(SUBSCRIBERS_KEY) || "[]");
+      if (subs.length === 0) {
+        alert("No hay registros para exportar.");
+        return;
+      }
+      let csv = "FECHA,EMAIL,NODO,BATCH\n";
+      subs.forEach((s: any) => {
+        const email = typeof s === "string" ? s : s.email;
+        const date = typeof s === "object" && s.timestamp ? s.timestamp : new Date().toISOString();
+        csv += `"${date}","${email}","MADRID_CENTRO","BATCH_01"\n`;
+      });
+      downloadFile(csv, `YUX_WAITLIST_${new Date().toISOString().substring(0, 10)}.csv`, "text/csv");
+    });
+
+    document.getElementById("btn-export-logo-requests-csv")?.addEventListener("click", () => {
+      const reqs = JSON.parse(localStorage.getItem("yux_rmb_logo_requests") || "[]");
+      if (reqs.length === 0) {
+        alert("No hay solicitudes de logotipo para exportar.");
+        return;
+      }
+      let csv = "FECHA,EMAIL,SOLICITANTE,MOTIVO\n";
+      reqs.forEach((r: any) => {
+        csv += `"${r.timestamp || ''}","${r.email || ''}","${(r.name || '').replace(/"/g, '""')}","${(r.reason || '').replace(/"/g, '""')}"\n`;
+      });
+      downloadFile(csv, `YUX_SOLICITUDES_LOGO_${new Date().toISOString().substring(0, 10)}.csv`, "text/csv");
+    });
+
+    // Subida y manejo de imagen en local
+    const imageInput = document.getElementById("image-file-input") as HTMLInputElement;
+    const fileInfoBadge = document.getElementById("file-info-badge");
+    const previewUploadedImg = document.getElementById("preview-uploaded-image") as HTMLImageElement;
+    const previewFallbackText = document.getElementById("preview-fallback-text");
+    const btnBundleImg = document.getElementById("btn-bundle-img") as HTMLButtonElement;
+    let selectedImageBlob: Blob | null = null;
+
+    imageInput?.addEventListener("change", (e: any) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        selectedImageBlob = file;
+        if (fileInfoBadge) fileInfoBadge.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        const reader = new FileReader();
+        reader.onload = (re) => {
+          if (previewUploadedImg && re.target?.result) {
+            previewUploadedImg.src = re.target.result as string;
+            previewUploadedImg.classList.remove("hidden");
+            previewFallbackText?.classList.add("hidden");
+          }
+        };
+        reader.readAsDataURL(file);
+        if (btnBundleImg) btnBundleImg.disabled = false;
+      }
+    });
+
+    // Form logic & live updates
+    const codeEl = document.getElementById('field-code') as HTMLInputElement;
+    const titleEl = document.getElementById('field-title') as HTMLInputElement;
+    const subjectEl = document.getElementById('field-subject') as HTMLInputElement;
+    const dateEl = document.getElementById('field-date') as HTMLInputElement;
+    const coordsEl = document.getElementById('field-coords') as HTMLInputElement;
+    const latEl = document.getElementById('field-lat') as HTMLInputElement;
+    const lngEl = document.getElementById('field-lng') as HTMLInputElement;
+    const errorEl = document.getElementById('field-error') as HTMLInputElement;
+    const manifestEl = document.getElementById('field-manifest') as HTMLTextAreaElement;
+    const accentEl = document.getElementById('field-accent') as HTMLInputElement;
+    const accentPicker = document.getElementById('field-accent-picker') as HTMLInputElement;
+    const mediaTypeEl = document.getElementById('field-media-type') as HTMLSelectElement;
+    const statusEl = document.getElementById('field-status') as HTMLSelectElement;
+
+    const previewCard = document.getElementById('preview-card');
+    const previewCodeBadge = document.getElementById('preview-card-code-badge');
+    const previewStatusBadge = document.getElementById('preview-card-status-badge');
+    const previewTitle = document.getElementById('preview-card-title');
+    const previewSubject = document.getElementById('preview-card-subject');
+    const previewCoords = document.getElementById('preview-card-coords');
+    const previewError = document.getElementById('preview-card-error');
+    const previewText = document.getElementById('preview-card-text');
+    const previewMediaLabel = document.getElementById('preview-card-media-label');
+
+    const outputMd = document.getElementById('output-markdown');
+    const outputCaption = document.getElementById('output-caption');
+    const mdFilenameLabel = document.getElementById('md-filename-label');
+    const downloadMdLabel = document.getElementById('download-md-label');
+    const downloadImgLabel = document.getElementById('download-img-label');
+
+    function update() {
+      const code = (codeEl?.value || '009').padStart(3, '0');
+      const title = titleEl?.value || 'TITULO // ERROR';
+      const subject = subjectEl?.value || 'Sujeto, Madrid';
+      const date = dateEl?.value || '';
+      const coords = coordsEl?.value || '40°00\'00"N 3°00\'00"O';
+      const lat = parseFloat(latEl?.value || '0');
+      const lng = parseFloat(lngEl?.value || '0');
+      const error = errorEl?.value || 'SYS_ERROR: UNKNOWN';
+      const manifest = manifestEl?.value || '';
+      const accent = accentEl?.value || '#C41E1E';
+      const mediaType = mediaTypeEl?.value || 'image';
+      const status = statusEl?.value || 'CORRUPTED';
+
+      if (previewCard) previewCard.style.setProperty('--card-accent', accent);
+      if (previewCodeBadge) previewCodeBadge.textContent = `#${code}`;
+      if (previewStatusBadge) {
+        previewStatusBadge.textContent = `[${status}]`;
+        previewStatusBadge.style.color = accent;
+      }
+      if (previewTitle) previewTitle.textContent = title;
+      if (previewSubject) previewSubject.textContent = subject;
+      if (previewCoords) previewCoords.textContent = coords;
+      if (previewError) {
+        previewError.textContent = error;
+        previewError.style.color = accent;
+      }
+      if (previewText) previewText.textContent = manifest;
+      if (previewMediaLabel) previewMediaLabel.textContent = `${code}.${mediaType === 'video' ? 'mp4' : 'jpg'}`;
+
+      if (mdFilenameLabel) mdFilenameLabel.textContent = `GENERADOR_OUTPUT // ${code}.MD`;
+      if (downloadMdLabel) downloadMdLabel.textContent = `${code}.md`;
+      if (downloadImgLabel) downloadImgLabel.textContent = `${code}.jpg`;
+
+      const mdContent = `---
+code: "${code}"
+title: "${title}"
+subject: "${subject}"
+coords: "${coords.replace(/"/g, '\\"')}"
+lat: ${lat}
+lng: ${lng}
+${date ? `date_captured: "${date}"\n` : ''}error_message: "${error}"
+manifest_text: "${manifest.replace(/"/g, '\\"')}"
+grid_version: "RMB-V1.2"
+image: "${code}.${mediaType === 'video' ? 'mp4' : 'jpg'}"
+media_type: "${mediaType}"
+accent_color: "${accent}"
+status: "${status}"
+---`;
+
+      if (outputMd) outputMd.textContent = mdContent;
+
+      const captionContent = `YUX
+
+${manifest}
+
+${error}
+YUX-RMB / #${code} / ${coords} / GRID: RMB-V1.2
+
+#retromaximalismobruto #diseñográfico #brutalism #retrofuturismo #maximalism #collageart #glitchart #madrid`;
+
+      if (outputCaption) outputCaption.textContent = captionContent;
+    }
+
+    accentPicker?.addEventListener('input', () => {
+      if (accentEl) accentEl.value = accentPicker.value.toUpperCase();
+      update();
+    });
+
+    accentEl?.addEventListener('input', () => {
+      if (accentPicker && /^#[0-9A-F]{6}$/i.test(accentEl.value)) {
+        accentPicker.value = accentEl.value;
+      }
+      update();
+    });
+
+    [codeEl, titleEl, subjectEl, dateEl, coordsEl, latEl, lngEl, errorEl, manifestEl, mediaTypeEl, statusEl].forEach(inp => {
+      inp?.addEventListener('input', update);
+    });
+
+    // Copy text
+    document.getElementById('btn-copy-md')?.addEventListener('click', () => {
+      if (outputMd?.textContent) {
+        navigator.clipboard.writeText(outputMd.textContent).then(() => {
+          const toast = document.getElementById('md-copied-toast');
+          if (toast) {
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+          }
+        });
+      }
+    });
+
+    document.getElementById('btn-copy-caption')?.addEventListener('click', () => {
+      if (outputCaption?.textContent) {
+        navigator.clipboard.writeText(outputCaption.textContent).then(() => {
+          const toast = document.getElementById('caption-copied-toast');
+          if (toast) {
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+          }
+        });
+      }
+    });
+
+    // Descarga de archivos directos
+    function downloadFile(content: string | Blob, filename: string, type = "text/plain;charset=utf-8") {
+      const blob = typeof content === "string" ? new Blob([content], { type }) : content;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById('btn-download-md')?.addEventListener('click', () => {
+      const code = (codeEl?.value || '009').padStart(3, '0');
+      if (outputMd?.textContent) {
+        downloadFile(outputMd.textContent, `${code}.md`);
+      }
+    });
+
+    document.getElementById('btn-bundle-md')?.addEventListener('click', () => {
+      const code = (codeEl?.value || '009').padStart(3, '0');
+      if (outputMd?.textContent) {
+        downloadFile(outputMd.textContent, `${code}.md`);
+      }
+    });
+
+    btnBundleImg?.addEventListener('click', () => {
+      const code = (codeEl?.value || '009').padStart(3, '0');
+      if (selectedImageBlob) {
+        downloadFile(selectedImageBlob, `${code}.jpg`, "image/jpeg");
+      }
+    });
+
+    // Cargar pieza existente en el editor
+    document.querySelectorAll('.btn-load-piece').forEach((btn) => {
+      btn.addEventListener('click', (e: any) => {
+        const data = JSON.parse(e.currentTarget.getAttribute('data-piece'));
+        if (data) {
+          if (codeEl) codeEl.value = data.code;
+          if (titleEl) titleEl.value = data.title;
+          if (subjectEl) subjectEl.value = data.subject;
+          if (dateEl) dateEl.value = data.date_captured || '';
+          if (coordsEl) coordsEl.value = data.coords;
+          if (latEl) latEl.value = data.lat || '';
+          if (lngEl) lngEl.value = data.lng || '';
+          if (errorEl) errorEl.value = data.error_message;
+          if (manifestEl) manifestEl.value = data.manifest_text;
+          if (accentEl) accentEl.value = data.accent_color;
+          if (accentPicker) accentPicker.value = data.accent_color;
+          if (mediaTypeEl) mediaTypeEl.value = data.media_type || 'image';
+          if (statusEl) statusEl.value = data.status || 'CORRUPTED';
+          update();
+          setActiveTab('editor');
+        }
+      });
+    });
+
+    update();
+  }
+
+  initWorkbenchSecurity();
+  document.addEventListener('astro:page-load', initWorkbenchSecurity);
+</script>

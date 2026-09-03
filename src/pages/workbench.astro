@@ -1,0 +1,29 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Workbench from '../components/Workbench.astro';
+
+const piezas = await getCollection('piezas');
+piezas.sort((a, b) => a.data.code.localeCompare(b.data.code));
+---
+
+<Layout title="Workbench // Generador Interno">
+  <Navbar activePath="/workbench" statusText="[WORKBENCH: ACCESO PROTEGIDO // PROTOCOLO RMB]" />
+
+  <div class="mb-6 border-b-2 border-[var(--negro)] pb-4 flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div>
+      <div class="font-mono-tech text-xs uppercase text-[var(--rojo)] font-bold mb-1">
+        SYS_MODULE // WORKBENCH FORENSE
+      </div>
+      <h1 class="font-display text-4xl md:text-6xl uppercase tracking-tighter leading-none text-[var(--negro)]">
+        Generador Interno
+      </h1>
+    </div>
+    <div class="font-mono-tech text-xs text-[#555] max-w-md">
+      Herramienta de producción para catalogar nuevas piezas, generar archivos .md validados y captions oficiales de Instagram.
+    </div>
+  </div>
+
+  <Workbench existingPieces={piezas} />
+</Layout>

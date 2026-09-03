@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Card from '../../components/Card.astro';
+
+const piezas = await getCollection('piezas');
+piezas.sort((a, b) => a.data.code.localeCompare(b.data.code));
+
+const images = import.meta.glob<{ default: ImageMetadata }>('../../assets/*.{jpeg,jpg,png,gif}');
+---
+
+<Layout title="Archivo">
+  <Navbar activePath="/archivo" statusText={`[CATÁLOGO COMPLETO: ${piezas.length} EXPEDIENTES]` } />
+
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-8 border-b-2 border-[var(--negro)] pb-4 gap-4">
+    <div>
+      <div class="font-mono-tech text-xs uppercase text-[var(--rojo)] font-bold mb-1">
+        SYS_MODULE // ARCHIVO CENTRAL
+      </div>
+      <h1 class="font-display text-5xl md:text-7xl tracking-tighter leading-none text-[var(--negro)]">
+        Índice General
+      </h1>
+    </div>
+    <span class="font-mono-tech text-xs uppercase text-[#666]">
+      SISTEMA RMB // MATRIZ 3:4 BRUTALISTA
+    </span>
+  </div>
+
+  <!-- Cuadrícula Brutalista (gap 2px sobre fondo negro) -->
+  <div class="bg-[var(--negro)] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-[2px] p-[2px]">
+    {piezas.map((pieza) => (
+      <Card pieza={pieza} images={images} />
+    ))}
+  </div>
+</Layout>

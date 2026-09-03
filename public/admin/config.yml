@@ -1,0 +1,32 @@
+backend:
+  name: git-gateway
+  branch: main
+
+# Guardar imágenes en src/assets para que Astro las optimice
+media_folder: "src/assets"
+# El CMS guardará la ruta como "/001.jpg" o "001.jpg"
+public_folder: ""
+
+collections:
+  - name: "piezas"
+    label: "Piezas"
+    folder: "src/content/piezas"
+    create: true
+    slug: "{{code}}"
+    extension: "md"
+    format: "yaml-frontmatter"
+    fields:
+      - {label: "Código", name: "code", widget: "string", pattern: ['^\d{3}$', "Debe ser de 3 dígitos (ej: 009)"]}
+      - {label: "Título", name: "title", widget: "string"}
+      - {label: "Sujeto", name: "subject", widget: "string"}
+      - {label: "Coordenadas", name: "coords", widget: "string"}
+      - {label: "Latitud GPS (Mapa)", name: "lat", widget: "number", value_type: "float", required: false}
+      - {label: "Longitud GPS (Mapa)", name: "lng", widget: "number", value_type: "float", required: false}
+      - {label: "Fecha de captura", name: "date_captured", widget: "string", required: false}
+      - {label: "Mensaje de Error", name: "error_message", widget: "string"}
+      - {label: "Manifiesto", name: "manifest_text", widget: "text"}
+      - {label: "Versión de Grid", name: "grid_version", widget: "string", default: "RMB-V1.2"}
+      - {label: "Imagen", name: "image", widget: "image"}
+      - {label: "Tipo de Medio", name: "media_type", widget: "select", options: ["image", "video"], default: "image"}
+      - {label: "Color de Acento (Hex)", name: "accent_color", widget: "string", default: "#C41E1E"}
+      - {label: "Estado Forense", name: "status", widget: "select", options: ["CORRUPTED", "ARCHIVED", "SYSTEM_FAIL"], default: "CORRUPTED"}

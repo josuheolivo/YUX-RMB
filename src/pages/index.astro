@@ -1,0 +1,72 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import Glyph from '../components/Glyph.astro';
+import Card from '../components/Card.astro';
+import Navbar from '../components/Navbar.astro';
+
+const piezas = await getCollection('piezas');
+piezas.sort((a, b) => b.data.code.localeCompare(a.data.code)); // Recientes primero
+const recientes = piezas.slice(0, 4); // Preview de 4 piezas
+
+const images = import.meta.glob<{ default: ImageMetadata }>('../assets/*.{jpeg,jpg,png,gif}');
+---
+
+<Layout title="Home">
+  <div class="min-h-[80vh] flex flex-col">
+    <Navbar activePath="/" statusText={`[ARCHIVE STATUS: ACTIVE — ${piezas.length} PIEZAS CATALOGADAS]`} />
+
+    <div class="flex-grow flex flex-col justify-center">
+      <div class="flex flex-col md:flex-row items-center gap-8 mb-16 py-6 border-b-2 border-[var(--negro)]">
+        <Glyph class="w-36 h-36 md:w-52 md:h-52 flex-shrink-0" />
+        <h1 class="font-display text-[13vw] md:text-9xl uppercase tracking-tighter leading-[0.85] text-[var(--negro)] break-words">
+          YUX<br/><span class="text-[var(--rojo)]">//</span> RMB
+        </h1>
+      </div>
+      
+      <!-- Manifiesto colapsable usando details/summary HTML5 nativo con bordes duros y sombra dura -->
+      <details class="group border-2 border-[var(--negro)] bg-[var(--negro)] text-[var(--hueso)] mb-16 cursor-pointer shadow-[4px_4px_0px_0px_#0A0A0A]">
+        <summary class="p-4 font-mono-tech font-bold text-sm md:text-base uppercase select-none flex justify-between items-center list-none">
+          <span>LOG DE SISTEMA — PROTOCOLO 01 (DESPLEGAR MANIFIESTO)</span>
+          <span class="text-[var(--rojo)] group-open:rotate-180 transition-transform duration-75">▼</span>
+        </summary>
+        <div class="p-6 border-t-2 border-[var(--hueso)] font-body-manifesto text-base md:text-lg leading-relaxed space-y-4">
+          <p class="font-bold font-mono-tech text-sm text-[var(--rojo)]">Esto no es un log de errores. Es lo único honesto que queda del sistema.</p>
+          <ol class="list-decimal pl-6 space-y-2 text-sm md:text-base">
+            <li>Todo monumento es una promesa que el tiempo corrompe. Documentamos la corrupción, no la promesa.</li>
+            <li>La estructura no miente: el concreto no fue diseñado para ocultar nada, y nosotros tampoco.</li>
+            <li>El exceso no es error — es la única respuesta honesta al ruido del mundo real.</li>
+            <li>El futuro ya llegó y no tuvo la decencia de avisar. Encontramos sus restos incrustados en lo que ya existía.</li>
+            <li>Cada pieza es un fragmento de un archivo mayor que nadie terminó de catalogar.</li>
+            <li>Un dato inventado es una mentira con formato de verdad. Toda coordenada en este archivo es real.</li>
+            <li>El error nunca es decoración — es el único lugar donde el sistema dice la verdad sobre sí mismo.</li>
+            <li>No restauramos monumentos. Los archivamos en el momento exacto en que empiezan a fallar.</li>
+            <li>YUX no firma piezas bonitas. Firma evidencia.</li>
+          </ol>
+          <div class="border-t border-[var(--hueso)] pt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+            <p class="font-bold font-mono-tech text-xs text-[var(--rojo)]">FIN DEL LOG — [ARCHIVE STATUS: INCOMPLETE]</p>
+            <a href="/manifiesto" class="text-xs font-mono-tech uppercase underline hover:text-[var(--rojo)] transition-colors duration-75">
+              LEER MITOLOGÍA COMPLETA →
+            </a>
+          </div>
+        </div>
+      </details>
+      
+      <div class="border-t-2 border-[var(--negro)] pt-8">
+        <div class="flex justify-between items-end mb-6">
+          <h2 class="font-display text-4xl md:text-6xl uppercase tracking-tighter">Últimas Entradas</h2>
+          <a href="/archivo" class="font-mono-tech font-bold hover:text-[var(--rojo)] text-xs md:text-sm uppercase transition-colors duration-75">
+            VER CATÁLOGO COMPLETO [{piezas.length}] →
+          </a>
+        </div>
+        
+        <!-- Cuadrícula Brutalista (gap 2px sobre fondo negro) -->
+        <div class="bg-[var(--negro)] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[2px] p-[2px]">
+          {recientes.map((pieza) => (
+            <Card pieza={pieza} images={images} />
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

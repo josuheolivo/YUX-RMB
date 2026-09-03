@@ -1,0 +1,57 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import TacticalMap from '../components/TacticalMap.astro';
+
+const piezas = await getCollection('piezas');
+piezas.sort((a, b) => a.data.code.localeCompare(b.data.code));
+---
+
+<Layout title="Cartografía Forense // Radar Táctico">
+  <Navbar activePath="/mapa" statusText="[RADAR: 8 NODOS EN VIGILANCIA]" />
+
+  <div class="mb-6 border-b-2 border-[var(--negro)] pb-4 flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div>
+      <div class="font-mono-tech text-xs uppercase text-[var(--rojo)] font-bold mb-1">
+        SYS_MODULE // CARTOGRAFÍA MILITAR
+      </div>
+      <h1 class="font-display text-4xl md:text-6xl uppercase tracking-tighter leading-none text-[var(--negro)]">
+        Cartografía del Fallo
+      </h1>
+    </div>
+    <p class="font-mono-tech text-xs text-[#555] max-w-md">
+      Intercepciones GPS en Madrid. Cada vector [ + ] representa una anomalía arquitectónica documentada por el protocolo RMB.
+    </p>
+  </div>
+
+  <TacticalMap pieces={piezas} />
+
+  <!-- Registro de Nodos en Cuadrícula Brutalista -->
+  <div class="mt-8 border-2 border-[var(--negro)] bg-[var(--hueso)] p-4 shadow-[4px_4px_0px_0px_#0A0A0A]">
+    <div class="border-b border-[var(--negro)] pb-2 mb-3 flex justify-between font-mono-tech text-xs font-bold uppercase">
+      <span>NODOS ACTIVOS EN SECTOR MADRID</span>
+      <span class="text-[var(--rojo)]">STATUS: COBERTURA FORENSE 100%</span>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 font-mono-tech text-xs">
+      {piezas.map((p) => (
+        <a 
+          href={`/archivo/${p.data.code}`}
+          class="p-2 border border-[var(--concreto)] hover:border-[var(--negro)] hover:bg-[var(--concreto)] transition-colors duration-75 block group"
+        >
+          <div class="flex justify-between items-center text-[10px] mb-1">
+            <span class="font-bold">#{p.data.code}</span>
+            <span class="w-2 h-2 inline-block border border-black" style={`background-color: ${p.data.accent_color};`}></span>
+          </div>
+          <p class="font-display text-sm tracking-tight leading-tight truncate group-hover:text-[var(--rojo)]">
+            {p.data.title}
+          </p>
+          <p class="text-[10px] text-[#666] truncate mt-1">
+            {p.data.subject}
+          </p>
+        </a>
+      ))}
+    </div>
+  </div>
+</Layout>

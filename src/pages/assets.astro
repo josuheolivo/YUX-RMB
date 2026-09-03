@@ -1,0 +1,717 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Glyph from '../components/Glyph.astro';
+
+const piezas = await getCollection('piezas');
+piezas.sort((a, b) => a.data.code.localeCompare(b.data.code));
+
+const assetPackages = [
+  {
+    id: "PKG-01",
+    filename: "PRESET_RMB_LIGHTROOM.xmp",
+    title: "LUT / PRESET COLOR FORENSE",
+    format: ".XMP // ADOBE LIGHTROOM & CAMERA RAW",
+    size: "1.4 KB",
+    description: "Curvas de calibración tonal que emulan el sistema RMB: sombras frías navy profundo (#0B0B1F), medios tonos cemento (#B8B3AA), altas luces hueso (#F0EDE6) y grano mecánico de micro-fricción.",
+    path: "/assets/downloads/PRESET_RMB_LIGHTROOM.xmp",
+    isRestricted: false,
+    icon: "🎨"
+  },
+  {
+    id: "PKG-02",
+    filename: "YUX_GLYPH_VECTOR.svg",
+    title: "ISOTIPO OFICIAL VECTORIAL",
+    format: ".SVG // ESCALABLE ILIMITADO",
+    size: "2.1 KB",
+    description: "Sello de identidad brutalista de 200x200px con tipografía de condensación máxima, coordenadas y marco rígido de 3px. Distribución protegida para preservar la integridad de la marca YUX.",
+    path: "",
+    isRestricted: true,
+    icon: "📐"
+  },
+  {
+    id: "PKG-03",
+    filename: "WALLPAPERS_9_16.zip",
+    title: "FONDOS MOBILE // CALIDAD ORIGINAL",
+    format: ".JPG // 768x1376 (9:16 MASTER HQ)",
+    size: "8 PIEZAS // 7.5 MB TOTAL",
+    description: "Archivos en máxima calidad original sin compresión para smartphones. Selecciona las piezas individuales que deseas o descarga el archivo .ZIP completo.",
+    path: "/assets/downloads/WALLPAPERS_9_16.zip",
+    isRestricted: false,
+    isWallpaperSelector: true,
+    icon: "📱"
+  }
+];
+---
+
+<Layout title="Transferencia de Assets // Descargas">
+  <Navbar activePath="/assets" statusText="[TRANSFERENCIA: PROTOCOLO DE DESCARGA ACTIVO]" />
+
+  <div class="mb-8 border-b-2 border-[var(--negro)] pb-4 flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div>
+      <div class="font-mono-tech text-xs uppercase text-[var(--rojo)] font-bold mb-1">
+        SYS_MODULE // EXTRACCIÓN DE IDENTIDAD
+      </div>
+      <h1 class="font-display text-4xl md:text-6xl uppercase tracking-tighter leading-none text-[var(--negro)]">
+        Transferencia de Assets
+      </h1>
+    </div>
+    <div class="font-mono-tech text-xs text-[#555] max-w-md">
+      Recursos de distribución pública para expandir la estética RMB fuera del navegador. Archivos maestros en resolución y calidad original.
+    </div>
+  </div>
+
+  <!-- Tarjetas de Paquetes Principales -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch mb-12">
+    {assetPackages.map((pkg) => (
+      <div class="win95-container p-2 flex flex-col justify-between shadow-[4px_4px_0px_0px_#0A0A0A]">
+        <div>
+          <!-- Titlebar Win95 -->
+          <div class="win95-titlebar text-xs mb-3">
+            <span class="truncate">{pkg.filename}</span>
+            <span class="text-[10px] ml-2 font-mono-tech">{pkg.size}</span>
+          </div>
+
+          <!-- Contenido de la ventana -->
+          <div class="p-3 bg-[#D4D0C8] border border-[#808080] border-t-white border-l-white mb-4">
+            <div class="flex justify-between items-center text-[10px] font-mono-tech text-[#555] mb-2 border-b border-[#AAA] pb-1">
+              <span>{pkg.id}</span>
+              <span class="font-bold text-[var(--negro)]">{pkg.format}</span>
+            </div>
+
+            <h2 class="font-display text-xl tracking-tight text-[var(--negro)] mb-1">
+              {pkg.title}
+            </h2>
+
+            {pkg.isRestricted && (
+              <div class="mb-2">
+                <span class="inline-block font-mono-tech text-[9px] font-bold bg-[var(--negro)] text-[var(--rojo)] px-2 py-0.5 border border-[var(--rojo)] uppercase">
+                  [ ACCESO RESTRINGIDO // CONTROL DE MARCA ]
+                </span>
+              </div>
+            )}
+
+            {pkg.isWallpaperSelector && (
+              <div class="mb-2">
+                <span class="inline-block font-mono-tech text-[9px] font-bold bg-[var(--negro)] text-[var(--verde-acido)] px-2 py-0.5 border border-[var(--verde-acido)] uppercase">
+                  [ CALIDAD ORIGINAL 100% // 768x1376 ]
+                </span>
+              </div>
+            )}
+
+            <p class="font-mono-tech text-xs leading-relaxed text-[#222]">
+              {pkg.description}
+            </p>
+          </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="p-2 pt-0">
+          {pkg.isRestricted ? (
+            <div class="flex justify-end">
+              <button 
+                type="button" 
+                id="btn-open-request-modal"
+                class="win95-btn font-bold text-xs flex items-center gap-2 text-[var(--rojo)] border-2 border-[var(--rojo)] cursor-pointer"
+              >
+                <span>🔒</span>
+                <span>[ SOLICITAR LOGO .SVG ]</span>
+              </button>
+            </div>
+          ) : pkg.isWallpaperSelector ? (
+            <div class="flex flex-wrap justify-end gap-2">
+              <button 
+                type="button" 
+                id="btn-open-wallpapers-modal"
+                class="win95-btn font-bold text-xs flex items-center gap-1.5 cursor-pointer text-[var(--negro)]"
+              >
+                <span>🗂️</span>
+                <span>[ SELECCIONAR WALLPAPERS ]</span>
+              </button>
+              <a 
+                href={pkg.path} 
+                download="WALLPAPERS_9_16_YUX_RMB.zip"
+                class="win95-btn text-[10px] flex items-center gap-1 font-bold"
+                title="Descargar todos los 8 wallpapers en archivo comprimido .ZIP (7.5 MB)"
+              >
+                <span>⚡</span>
+                <span>[ PACK COMPLETO .ZIP ]</span>
+              </a>
+            </div>
+          ) : (
+            <div class="flex justify-end">
+              <a 
+                href={pkg.path} 
+                download={pkg.filename}
+                class="win95-btn font-bold text-xs flex items-center gap-2"
+              >
+                <span>[ DESCARGAR ARCHIVO ]</span>
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- SECCIÓN INLINE: SELECTOR INDIVIDUAL DE WALLPAPERS (ALTA CALIDAD ORIGINAL) -->
+  <section class="border-2 border-[var(--negro)] bg-[var(--hueso)] p-4 sm:p-6 mb-12 shadow-[6px_6px_0px_0px_#0A0A0A]">
+    <div class="border-b-2 border-[var(--negro)] pb-4 mb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+      <div>
+        <div class="font-mono-tech text-xs uppercase text-[var(--rojo)] font-bold mb-1 flex items-center gap-2">
+          <span class="inline-block w-2.5 h-2.5 bg-[var(--rojo)] animate-pulse"></span>
+          <span>DISPATCHER // SELECCIÓN INDIVIDUAL DE PIEZAS</span>
+        </div>
+        <h2 class="font-display text-3xl sm:text-4xl uppercase tracking-tighter text-[var(--negro)] leading-none">
+          Wallpapers Mobile en Calidad Original
+        </h2>
+        <p class="font-mono-tech text-xs text-[#555] mt-1">
+          Proporción vertical 9:16 (768 x 1376 px). Archivos originales sin compresión con ficha técnica completa.
+        </p>
+      </div>
+
+      <!-- Barra de Acciones Globales de la Sección -->
+      <div class="flex flex-wrap items-center gap-2 font-mono-tech text-xs">
+        <button id="inline-btn-select-all" class="win95-btn text-[10px] font-bold">
+          [ SELECCIONAR TODOS ]
+        </button>
+        <button id="inline-btn-deselect-all" class="win95-btn text-[10px]">
+          [ LIMPIAR SELECCIÓN ]
+        </button>
+        <button id="inline-btn-download-selected" class="win95-btn text-[11px] font-bold text-[var(--rojo)]" disabled>
+          [ ⬇️ DESCARGAR SELECCIÓN (<span class="selection-count-badge">0</span>) ]
+        </button>
+        <a 
+          href="/assets/downloads/WALLPAPERS_9_16.zip" 
+          download="WALLPAPERS_9_16_YUX_RMB.zip"
+          class="win95-btn text-[11px] font-bold flex items-center gap-1"
+        >
+          <span>⚡</span>
+          <span>[ PACK COMPLETO .ZIP (7.5 MB) ]</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Grid de Wallpapers 9:16 -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {piezas.map((p) => {
+        const d = p.data;
+        const wallpaperUrl = `/assets/wallpapers/${d.code}.jpg`;
+        const downloadFilename = `YUX_WALLPAPER_${d.code}_${d.title.replace(/[^a-zA-Z0-9]/g, '_')}.jpg`;
+        
+        return (
+          <article 
+            class="wallpaper-card border-2 border-[var(--negro)] bg-white flex flex-col justify-between relative group hover:shadow-[4px_4px_0px_0px_#0A0A0A] transition-shadow duration-75"
+            style={`--wp-accent: ${d.accent_color};`}
+            data-code={d.code}
+            data-url={wallpaperUrl}
+            data-filename={downloadFilename}
+          >
+            <!-- Checkbox superior izquierdo -->
+            <label class="absolute top-2 left-2 z-20 bg-[var(--negro)] text-[var(--hueso)] p-1.5 flex items-center gap-1.5 font-mono-tech text-[10px] cursor-pointer select-none border border-white">
+              <input 
+                type="checkbox" 
+                class="wallpaper-checkbox cursor-pointer accent-[var(--rojo)]"
+                data-code={d.code}
+                data-url={wallpaperUrl}
+                data-filename={downloadFilename}
+              />
+              <span class="font-bold">SELECCIONAR</span>
+            </label>
+
+            <!-- Badge Superior Derecho -->
+            <span class="absolute top-2 right-2 z-20 bg-[var(--negro)] text-[var(--wp-accent)] font-mono-tech text-[10px] px-2 py-0.5 font-bold border border-[#444] select-none">
+              #{d.code}
+            </span>
+
+            <!-- Contenedor Media 9:16 con hover glitch -->
+            <div class="relative aspect-[9/16] bg-[var(--concreto)] overflow-hidden border-b-2 border-[var(--negro)]">
+              <img 
+                src={wallpaperUrl} 
+                alt={d.title} 
+                loading="lazy"
+                class="w-full h-full object-cover filter contrast-105 group-hover:contrast-125 group-hover:scale-105 transition-transform duration-75"
+              />
+              <!-- Overlay de Glitch cromático en hover -->
+              <div 
+                class="absolute inset-0 opacity-0 group-hover:opacity-30 pointer-events-none mix-blend-color-dodge transition-opacity duration-75" 
+                style={`background-color: var(--wp-accent);`}
+              ></div>
+            </div>
+
+            <!-- Ficha Técnica del Wallpaper -->
+            <div class="p-3 bg-[var(--hueso)] flex-1 flex flex-col justify-between font-mono-tech text-xs">
+              <div>
+                <p class="text-[10px] uppercase font-bold tracking-wider mb-0.5 truncate" style={`color: var(--wp-accent);`}>
+                  {d.error_message}
+                </p>
+                <h3 class="font-display text-lg tracking-tight text-[var(--negro)] leading-tight mb-1 truncate">
+                  {d.title}
+                </h3>
+                <p class="text-[10px] text-[#555] italic truncate mb-2">
+                  {d.subject}
+                </p>
+                <div class="text-[9px] text-[#777] border-t border-[#DDD] pt-1 mb-3 flex justify-between">
+                  <span>RES: 768x1376 (9:16)</span>
+                  <span class="font-bold text-[var(--negro)]">CALIDAD MASTER</span>
+                </div>
+              </div>
+
+              <!-- Botón de Descarga Individual de Máxima Calidad -->
+              <a 
+                href={wallpaperUrl} 
+                download={downloadFilename}
+                class="win95-btn font-bold text-[10px] text-center w-full flex items-center justify-center gap-1.5 text-[var(--negro)] hover:text-[var(--rojo)]"
+              >
+                <span>💾</span>
+                <span>[ DESCARGAR #{d.code} HQ ]</span>
+              </a>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  </section>
+
+  <!-- MODAL WINDOWS 95: SELECTOR Y GESTOR DE WALLPAPERS (MODAL DEDICADO) -->
+  <div 
+    id="wallpapers-modal-overlay" 
+    class="fixed inset-0 z-[10000] bg-[#0A0A0A] bg-opacity-80 flex items-center justify-center p-2 sm:p-4 hidden"
+  >
+    <div class="win95-container w-full max-w-5xl max-h-[94vh] flex flex-col p-2 shadow-[8px_8px_0px_0px_#0A0A0A]">
+      <!-- Titlebar -->
+      <div class="win95-titlebar text-xs mb-2 flex justify-between items-center flex-shrink-0">
+        <span class="font-mono-tech flex items-center gap-2">
+          <span>SYS_DISPATCHER // SELECTOR_WALLPAPERS_9_16.EXE</span>
+        </span>
+        <button 
+          id="btn-close-wallpapers-modal" 
+          type="button"
+          class="bg-[#C0C0C0] text-[var(--negro)] px-2 py-0 text-xs font-bold leading-none border border-white border-r-black border-bottom-black cursor-pointer active:translate-y-0.5"
+          title="Cerrar selector"
+        >×</button>
+      </div>
+
+      <!-- Barra de Estado & Herramientas -->
+      <div class="bg-[#D4D0C8] p-3 border border-[#808080] border-t-white border-l-white mb-2 font-mono-tech text-xs flex flex-wrap justify-between items-center gap-3 flex-shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 bg-[var(--verde-acido)] animate-pulse"></span>
+          <span class="font-bold text-[var(--negro)]">CALIDAD MASTER ORIGINAL // 768x1376 PX (9:16)</span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="modal-btn-select-all" class="win95-btn text-[10px] font-bold">
+            [ MARCAR TODOS ]
+          </button>
+          <button id="modal-btn-deselect-all" class="win95-btn text-[10px]">
+            [ DESMARCAR ]
+          </button>
+          <button id="modal-btn-download-selected" class="win95-btn text-[10px] font-bold text-[var(--rojo)]" disabled>
+            [ ⬇️ DESCARGAR SELECCIONADOS (<span class="selection-count-badge">0</span>) ]
+          </button>
+          <a 
+            href="/assets/downloads/WALLPAPERS_9_16.zip" 
+            download="WALLPAPERS_9_16_YUX_RMB.zip"
+            class="win95-btn text-[10px] font-bold"
+          >
+            [ ⚡ PACK COMPLETO .ZIP ]
+          </a>
+        </div>
+      </div>
+
+      <!-- Cuadrícula de Wallpapers Scrollable -->
+      <div class="flex-1 overflow-y-auto p-3 bg-[#111] border-2 border-[#808080] space-y-3">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {piezas.map((p) => {
+            const d = p.data;
+            const wallpaperUrl = `/assets/wallpapers/${d.code}.jpg`;
+            const downloadFilename = `YUX_WALLPAPER_${d.code}_${d.title.replace(/[^a-zA-Z0-9]/g, '_')}.jpg`;
+
+            return (
+              <div 
+                class="border border-[#444] bg-[#222] p-2 flex flex-col justify-between text-[var(--hueso)] font-mono-tech text-[10px]"
+                style={`--modal-wp-accent: ${d.accent_color};`}
+              >
+                <!-- Ratio 9:16 Thumbnail -->
+                <div class="relative aspect-[9/16] bg-black overflow-hidden border border-[#555] mb-2">
+                  <img 
+                    src={wallpaperUrl} 
+                    alt={d.title} 
+                    class="w-full h-full object-cover" 
+                    loading="lazy"
+                  />
+                  <label class="absolute top-1 left-1 z-10 bg-[var(--negro)] p-1 text-[9px] flex items-center gap-1 border border-white cursor-pointer select-none">
+                    <input 
+                      type="checkbox" 
+                      class="wallpaper-checkbox accent-[var(--rojo)]" 
+                      data-code={d.code}
+                      data-url={wallpaperUrl}
+                      data-filename={downloadFilename}
+                    />
+                    <span>ELEGIR</span>
+                  </label>
+                  <span class="absolute top-1 right-1 z-10 bg-[var(--negro)] font-bold text-[9px] px-1" style={`color: var(--modal-wp-accent);`}>
+                    #{d.code}
+                  </span>
+                </div>
+
+                <div class="mb-2">
+                  <p class="font-display text-xs text-white truncate">{d.title}</p>
+                  <p class="text-[9px] text-[#888] truncate">{d.subject}</p>
+                </div>
+
+                <a 
+                  href={wallpaperUrl} 
+                  download={downloadFilename}
+                  class="win95-btn text-[9px] font-bold text-center w-full block text-[var(--negro)]"
+                >
+                  [ 💾 DESCARGAR ]
+                </a>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <!-- Footer del Modal -->
+      <div class="pt-2 flex justify-between items-center text-[10px] font-mono-tech text-[#555]">
+        <span>ARCHIVOS FUENTE SIN COMPRESIÓN NI MARCAS DE AGUA ADICIONALES</span>
+        <button id="btn-footer-close-modal" class="win95-btn text-[10px] font-bold">
+          [ CERRAR SELECTOR ]
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL WINDOWS 95: SOLICITUD DE LOGOTIPO .SVG (PROTECCIÓN DE MARCA) -->
+  <div 
+    id="request-modal-overlay" 
+    class="fixed inset-0 z-[10000] bg-[#0A0A0A] bg-opacity-80 flex items-center justify-center p-4 hidden"
+  >
+    <div class="win95-container w-full max-w-lg p-2 shadow-[8px_8px_0px_0px_#0A0A0A]">
+      <!-- Titlebar con botón de cerrar -->
+      <div class="win95-titlebar text-xs mb-3 flex justify-between items-center">
+        <span class="font-mono-tech flex items-center gap-2">
+          <span>SYS_SECURITY // SOLICITUD_ISOTIPO_OFICIAL.EXE</span>
+        </span>
+        <button 
+          id="btn-close-modal" 
+          type="button"
+          class="bg-[#C0C0C0] text-[var(--negro)] px-2 py-0 text-xs font-bold leading-none border border-white border-r-black border-bottom-black cursor-pointer active:translate-y-0.5"
+          title="Cerrar ventana"
+        >×</button>
+      </div>
+
+      <!-- Pantalla 1: Formulario de Solicitud -->
+      <div id="modal-form-container" class="p-4 bg-[#D4D0C8] border border-[#808080] border-t-white border-l-white space-y-4">
+        <div class="flex items-start gap-3 bg-[#0A0A0A] p-3 text-[var(--hueso)] border border-[#333]">
+          <div class="w-8 h-8 bg-[var(--rojo)] text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
+            !
+          </div>
+          <div class="font-mono-tech text-[11px] leading-relaxed">
+            <p class="text-[var(--rojo)] font-bold uppercase mb-1">PROTOCOLO DE CONTROL DE MARCA YUX</p>
+            <p class="text-[#BBB]">
+              Para evitar copias no autorizadas y preservar la integridad de la marca, el archivo vectorial maestro (.SVG) se envía de forma personalizada. Describe el proyecto o motivo por el que solicitas el logotipo; Josuhe evaluará la solicitud y te lo remitirá directamente a tu correo.
+            </p>
+          </div>
+        </div>
+
+        <form id="logo-request-form" class="space-y-3 font-mono-tech text-xs">
+          <div>
+            <label for="req-email" class="block font-bold text-[10px] text-[#222] uppercase mb-1">
+              CORREO ELECTRÓNICO DEL SOLICITANTE (DONDE SE ENVIARÁ EL VECTOR)*:
+            </label>
+            <input 
+              type="email" 
+              id="req-email" 
+              class="w-full bg-white border-2 border-[var(--negro)] p-2 font-mono-tech outline-none font-bold focus:border-[var(--rojo)]"
+              placeholder="tu@dominio.com"
+              required
+            />
+          </div>
+
+          <div>
+            <label for="req-name" class="block font-bold text-[10px] text-[#222] uppercase mb-1">
+              NOMBRE / ESTUDIO / ORGANIZACIÓN (OPCIONAL):
+            </label>
+            <input 
+              type="text" 
+              id="req-name" 
+              class="w-full bg-white border-2 border-[var(--negro)] p-2 font-mono-tech outline-none focus:border-[var(--rojo)]"
+              placeholder="Nombre o entidad solicitante"
+            />
+          </div>
+
+          <div>
+            <label for="req-reason" class="block font-bold text-[10px] text-[#222] uppercase mb-1">
+              EXPOSICIÓN DE MOTIVOS // ¿POR QUÉ SOLICITAS EL LOGOTIPO?*:
+            </label>
+            <textarea 
+              id="req-reason" 
+              rows="4" 
+              class="w-full bg-white border-2 border-[var(--negro)] p-2 font-mono-tech outline-none text-[11px] leading-relaxed focus:border-[var(--rojo)]"
+              placeholder="Describe en detalle para qué proyecto, publicación, contexto o fin deseas utilizar el logotipo de YUX RMB..."
+              required
+            ></textarea>
+          </div>
+
+          <div class="flex justify-between items-center pt-2 border-t border-[#BBB]">
+            <button 
+              type="button" 
+              id="btn-cancel-modal" 
+              class="win95-btn text-[10px]"
+            >
+              ← CANCELAR
+            </button>
+            <button 
+              type="submit" 
+              id="btn-submit-request" 
+              class="win95-btn font-bold text-xs text-[var(--rojo)]"
+            >
+              [ TRANSMITIR SOLICITUD A JOSUHE ]
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Pantalla 2: Confirmación de Envío -->
+      <div id="modal-success-container" class="hidden p-5 bg-[#D4D0C8] border border-[#808080] border-t-white border-l-white space-y-4 font-mono-tech">
+        <div class="bg-[#0A0A0A] p-4 text-[var(--verde-acido)] border-2 border-[var(--verde-acido)] space-y-2">
+          <p class="font-bold text-xs sm:text-sm text-[var(--verde-acido)]">
+            >> TRANSMISIÓN REGISTRADA CON ÉXITO // EXPEDIENTE FORENSE CREADO
+          </p>
+          <p class="text-[11px] text-[#DDD] leading-relaxed">
+            Tu exposición de motivos ha sido transferida directamente al sistema de control de Josuhe RMB.
+          </p>
+          <div class="text-[10px] text-[#AAA] border-t border-[#333] pt-2">
+            CORREO REGISTRADO: <span id="confirmed-email-label" class="font-bold text-white"></span><br/>
+            ESTADO: EN COLA DE REVISIÓN // RESPUESTA PERSONALIZADA
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center pt-2">
+          <span class="text-[10px] text-[#555]">PROTOCOLO YUX V2.0 // VERIFICACIÓN HUMANA</span>
+          <button 
+            type="button" 
+            id="btn-done-modal" 
+            class="win95-btn font-bold text-xs"
+          >
+            [ CERRAR VENTANA ]
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manifiesto de Distribución Libre -->
+  <div class="border-2 border-[var(--negro)] bg-[var(--hueso)] p-6 shadow-[4px_4px_0px_0px_#0A0A0A]">
+    <div class="border-b border-[var(--negro)] pb-2 mb-3 flex justify-between font-mono-tech text-xs font-bold uppercase">
+      <span>LICENCIA DE CIRCULACIÓN // PROTOCOLO EVIDENCE-FIRST</span>
+      <span class="text-[var(--rojo)]">NO RESTRICTIVO (EXCEPTO IDENTIDAD DE MARCA)</span>
+    </div>
+    <p class="font-serif-manifesto text-sm leading-relaxed text-[#222]">
+      El archivo YUX no protege imágenes: libera evidencia. Los presets de color y fondos aquí alojados pueden ser reutilizados o proyectados siempre que se conserve la honestidad estructural de sus coordenadas y fallos. La marca y el isotipo vectorial oficial quedan protegidos bajo custodia para garantizar que cada firma mantenga el rigor del manifiesto RMB.
+    </p>
+  </div>
+</Layout>
+
+<script>
+  function setupAssetsPage() {
+    // 1. MODAL DE SOLICITUD DE LOGOTIPO (.SVG)
+    const requestModal = document.getElementById('request-modal-overlay');
+    const openReqBtn = document.getElementById('btn-open-request-modal');
+    const closeReqBtn = document.getElementById('btn-close-modal');
+    const cancelReqBtn = document.getElementById('btn-cancel-modal');
+    const doneReqBtn = document.getElementById('btn-done-modal');
+    const reqForm = document.getElementById('logo-request-form') as HTMLFormElement;
+    const reqFormContainer = document.getElementById('modal-form-container');
+    const reqSuccessContainer = document.getElementById('modal-success-container');
+    const reqEmailInput = document.getElementById('req-email') as HTMLInputElement;
+    const reqNameInput = document.getElementById('req-name') as HTMLInputElement;
+    const reqReasonInput = document.getElementById('req-reason') as HTMLTextAreaElement;
+    const confirmedEmailLabel = document.getElementById('confirmed-email-label');
+
+    function openReqModal() {
+      requestModal?.classList.remove('hidden');
+      reqFormContainer?.classList.remove('hidden');
+      reqSuccessContainer?.classList.add('hidden');
+      reqEmailInput?.focus();
+    }
+
+    function closeReqModal() {
+      requestModal?.classList.add('hidden');
+    }
+
+    openReqBtn?.addEventListener('click', openReqModal);
+    closeReqBtn?.addEventListener('click', closeReqModal);
+    cancelReqBtn?.addEventListener('click', closeReqModal);
+    doneReqBtn?.addEventListener('click', closeReqModal);
+
+    requestModal?.addEventListener('click', (e) => {
+      if (e.target === requestModal) closeReqModal();
+    });
+
+    reqForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = reqEmailInput?.value?.trim();
+      const name = reqNameInput?.value?.trim() || 'NO_ESPECIFICADO';
+      const reason = reqReasonInput?.value?.trim();
+
+      if (!email || !reason) return;
+
+      const submitBtn = document.getElementById('btn-submit-request');
+      if (submitBtn) {
+        submitBtn.textContent = '[ TRANSMITIENDO PETICIÓN... ]';
+        submitBtn.setAttribute('disabled', 'true');
+      }
+
+      const payload = {
+        email,
+        name,
+        reason,
+        timestamp: new Date().toISOString(),
+        tipo: 'SOLICITUD_LOGO_SVG',
+        nodo: 'CONTROL_DE_MARCA_ASSETS',
+      };
+
+      const storageKey = 'yux_rmb_logo_requests';
+      const existing = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      existing.push(payload);
+      localStorage.setItem(storageKey, JSON.stringify(existing));
+
+      const webhookUrl = localStorage.getItem('yux_google_sheets_webhook');
+      if (webhookUrl) {
+        try {
+          await fetch(webhookUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email,
+              timestamp: payload.timestamp,
+              nodo: `SOLICITUD_LOGO [${name}]`,
+              batch: reason.substring(0, 150)
+            })
+          });
+        } catch (err) {
+          console.warn('Error al transmitir al webhook:', err);
+        }
+      }
+
+      if (confirmedEmailLabel) confirmedEmailLabel.textContent = email;
+      reqFormContainer?.classList.add('hidden');
+      reqSuccessContainer?.classList.remove('hidden');
+
+      if (submitBtn) {
+        submitBtn.textContent = '[ TRANSMITIR SOLICITUD A JOSUHE ]';
+        submitBtn.removeAttribute('disabled');
+      }
+    });
+
+    // 2. MODAL Y GESTIÓN DE WALLPAPERS SELECCIONABLES (INLINE + MODAL)
+    const wallpapersModal = document.getElementById('wallpapers-modal-overlay');
+    const openWpModalBtn = document.getElementById('btn-open-wallpapers-modal');
+    const closeWpModalBtn = document.getElementById('btn-close-wallpapers-modal');
+    const footerCloseWpModalBtn = document.getElementById('btn-footer-close-modal');
+
+    function openWpModal() {
+      wallpapersModal?.classList.remove('hidden');
+    }
+
+    function closeWpModal() {
+      wallpapersModal?.classList.add('hidden');
+    }
+
+    openWpModalBtn?.addEventListener('click', openWpModal);
+    closeWpModalBtn?.addEventListener('click', closeWpModal);
+    footerCloseWpModalBtn?.addEventListener('click', closeWpModal);
+
+    wallpapersModal?.addEventListener('click', (e) => {
+      if (e.target === wallpapersModal) closeWpModal();
+    });
+
+    // Sincronización de checkboxes entre la vista inline y el modal
+    const allCheckboxes = document.querySelectorAll('.wallpaper-checkbox') as NodeListOf<HTMLInputElement>;
+    const countBadges = document.querySelectorAll('.selection-count-badge');
+    const inlineDownloadBtn = document.getElementById('inline-btn-download-selected') as HTMLButtonElement;
+    const modalDownloadBtn = document.getElementById('modal-btn-download-selected') as HTMLButtonElement;
+
+    function getSelectedWallpapers() {
+      const selectedMap = new Map();
+      allCheckboxes.forEach((cb) => {
+        if (cb.checked) {
+          const code = cb.getAttribute('data-code');
+          const url = cb.getAttribute('data-url');
+          const filename = cb.getAttribute('data-filename');
+          if (code && url && filename) {
+            selectedMap.set(code, { url, filename });
+          }
+        }
+      });
+      return Array.from(selectedMap.values());
+    }
+
+    function updateSelectionUI() {
+      const selected = getSelectedWallpapers();
+      const count = selected.length;
+
+      countBadges.forEach((badge) => {
+        badge.textContent = count.toString();
+      });
+
+      const isDisabled = count === 0;
+      if (inlineDownloadBtn) inlineDownloadBtn.disabled = isDisabled;
+      if (modalDownloadBtn) modalDownloadBtn.disabled = isDisabled;
+    }
+
+    allCheckboxes.forEach((cb) => {
+      cb.addEventListener('change', (e: any) => {
+        const code = cb.getAttribute('data-code');
+        const isChecked = cb.checked;
+        // Sincronizar todos los checkboxes del mismo código
+        allCheckboxes.forEach((otherCb) => {
+          if (otherCb.getAttribute('data-code') === code) {
+            otherCb.checked = isChecked;
+          }
+        });
+        updateSelectionUI();
+      });
+    });
+
+    function setAllSelection(checked: boolean) {
+      allCheckboxes.forEach((cb) => {
+        cb.checked = checked;
+      });
+      updateSelectionUI();
+    }
+
+    document.getElementById('inline-btn-select-all')?.addEventListener('click', () => setAllSelection(true));
+    document.getElementById('inline-btn-deselect-all')?.addEventListener('click', () => setAllSelection(false));
+    document.getElementById('modal-btn-select-all')?.addEventListener('click', () => setAllSelection(true));
+    document.getElementById('modal-btn-deselect-all')?.addEventListener('click', () => setAllSelection(false));
+
+    function downloadSelectedWallpapers() {
+      const selected = getSelectedWallpapers();
+      if (selected.length === 0) return;
+
+      // Descarga secuencial con delay de 250ms para evitar bloqueo de popups del navegador
+      selected.forEach((item, index) => {
+        setTimeout(() => {
+          const a = document.createElement('a');
+          a.href = item.url;
+          a.download = item.filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }, index * 250);
+      });
+    }
+
+    inlineDownloadBtn?.addEventListener('click', downloadSelectedWallpapers);
+    modalDownloadBtn?.addEventListener('click', downloadSelectedWallpapers);
+  }
+
+  setupAssetsPage();
+  document.addEventListener('astro:page-load', setupAssetsPage);
+</script>

@@ -1,0 +1,100 @@
+---
+import { Image } from 'astro:assets';
+
+interface Props {
+  pieza: any;
+  images?: Record<string, () => Promise<{ default: ImageMetadata }>>;
+}
+
+const { pieza, images } = Astro.props;
+const piece = pieza.data;
+
+let imageSrc: any = null;
+if (images && piece.image) {
+  const imagePath = `../../assets/${piece.image}`;
+  const altImagePath = `../assets/${piece.image}`;
+  const resolver = images[imagePath] || images[altImagePath];
+  if (resolver) {
+    const module = await resolver();
+    imageSrc = module.default;
+  }
+}
+---
+
+<article 
+  class="card-rmb group flex flex-col bg-[var(--hueso)] border-none relative overflow-hidden h-full" 
+  style={`--card-accent: ${piece.accent_color};`}
+>
+  <!-- Contenedor Media (Ratio 3:4) -->
+  <div class="card-media relative aspect-[3/4] bg-[var(--concreto)] overflow-hidden border-b-2 border-[var(--negro)]">
+    
+    <!-- Código alfanumérico superior -->
+    <span class="absolute top-2 left-2 z-10 bg-[var(--negro)] text-[var(--hueso)] font-mono-tech text-xs px-2 py-0.5 select-none">
+      #{piece.code}
+    </span>
+
+    <!-- Status Forense superior derecho -->
+    {piece.status && (
+      <span class="absolute top-2 right-2 z-10 bg-[var(--negro)] font-mono-tech text-[9px] px-1.5 py-0.5 font-bold border border-[#333] select-none" style="color: var(--card-accent);">
+        [{piece.status}]
+      </span>
+    )}
+
+    <!-- Renderizado condicional de Image / Video con Glitch Hover -->
+    {piece.media_type === 'video' ? (
+      <video 
+        src={`/assets/${piece.image}`} 
+        autoplay loop muted playsinline 
+        class="w-full h-full object-cover filter contrast-105 group-hover:contrast-125 group-hover:scale-105 transition-transform duration-75"
+      />
+    ) : imageSrc ? (
+      <Image 
+        src={imageSrc} 
+        alt={piece.title} 
+        width={700}
+        quality={90}
+        loading="lazy" 
+        class="w-full h-full object-cover filter contrast-105 group-hover:contrast-125 group-hover:scale-105 transition-transform duration-75 group-hover:translate-x-0.5"
+      />
+    ) : (
+      <img 
+        src={`/assets/${piece.image}`} 
+        alt={piece.title} 
+        loading="lazy" 
+        class="w-full h-full object-cover filter contrast-105 group-hover:contrast-125 group-hover:scale-105 transition-transform duration-75 group-hover:translate-x-0.5"
+      />
+    )}
+
+    <!-- Overlay de Glitch cromático en Hover -->
+    <div 
+      class="absolute inset-0 opacity-0 group-hover:opacity-30 pointer-events-none mix-blend-color-dodge transition-opacity duration-75" 
+      style="background-color: var(--card-accent);"
+    ></div>
+  </div>
+
+  <!-- Cuerpo de Ficha Técnica -->
+  <div class="p-4 flex-1 flex flex-col justify-between bg-[var(--hueso)]">
+    <div>
+      <p class="font-mono-tech text-xs uppercase mb-1 tracking-wider font-bold" style="color: var(--card-accent);">
+        {piece.error_message}
+      </p>
+      <h3 class="font-display text-2xl tracking-tighter leading-none mb-1 text-[var(--negro)] group-hover:text-[var(--card-accent)] transition-colors duration-75">
+        <a href={`/archivo/${piece.code}`} class="hover:underline">
+          {piece.title}
+        </a>
+      </h3>
+      <p class="text-xs italic text-[#444] mb-2">{piece.subject}</p>
+      <p class="font-mono-tech text-[10px] text-[#555] mb-3">{piece.coords}</p>
+      <p class="text-xs font-body-manifesto leading-relaxed text-[#111] line-clamp-3 mb-4">
+        {piece.manifest_text}
+      </p>
+    </div>
+
+    <div class="font-mono-tech text-[9px] text-[#888] border-t border-[#CCC] pt-2 flex justify-between items-center">
+      <span>GRID: {piece.grid_version}</span>
+      <a href={`/archivo/${piece.code}`} class="underline hover:text-[var(--negro)] font-bold uppercase transition-colors duration-75">
+        [VER EVIDENCIA]
+      </a>
+    </div>
+  </div>
+</article>

@@ -1,0 +1,58 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+---
+
+<Layout title="Manifiesto">
+  <Navbar activePath="/manifiesto" statusText="[DECLARACIÓN FUNDACIONAL 2029]" />
+
+  <article class="max-w-3xl mx-auto py-6">
+    <h1 class="font-display text-5xl md:text-7xl uppercase tracking-tighter leading-[0.85] mb-12 border-b-2 border-[var(--negro)] pb-6 text-[var(--negro)]">
+      Sobre el Archivo
+    </h1>
+
+    <div class="mb-14 font-body-manifesto text-base md:text-lg text-[var(--negro)] space-y-4 leading-relaxed">
+      <p class="font-mono-tech font-bold text-sm uppercase text-[var(--rojo)] tracking-wider mb-2">
+        // CONTEXTO DEL SISTEMA
+      </p>
+      
+      <p>
+        El archivo YUX RMB parte de una premisa ficcional: en algún punto no especificado, un sistema automatizado fue encargado de documentar el estado estructural de los monumentos y edificios históricos de Madrid.
+      </p>
+      <p>
+        El sistema empezó a fallar. No dejó de grabar: empezó a grabar mal. Las ventanas de error que aparecen en cada pieza son el registro literal de esas fallas.
+      </p>
+      <p>
+        Lo que ves es lo que queda de ese sistema — fotografías reales, procesadas por un proceso que ya no funciona del todo bien, con las coordenadas y fechas todavía intactas porque esa parte, por ahora, sigue funcionando.
+      </p>
+    </div>
+
+    <div class="bg-[var(--negro)] text-[var(--hueso)] p-6 md:p-10 border-2 border-[var(--negro)] shadow-[6px_6px_0px_0px_#0A0A0A]">
+      <h2 class="font-mono-tech font-bold text-lg md:text-xl uppercase mb-6 tracking-wider">
+        LOG DE SISTEMA — PROTOCOLO 01
+      </h2>
+      
+      <div class="font-body-manifesto text-base md:text-lg leading-relaxed space-y-4">
+        <p class="font-bold font-mono-tech text-sm text-[var(--rojo)]">
+          Esto no es un log de errores. Es lo único honesto que queda del sistema.
+        </p>
+        
+        <ol class="list-decimal pl-6 space-y-3">
+          <li>Todo monumento es una promesa que el tiempo corrompe. Documentamos la corrupción, no la promesa.</li>
+          <li>La estructura no miente: el concreto no fue diseñado para ocultar nada, y nosotros tampoco.</li>
+          <li>El exceso no es error — es la única respuesta honesta al ruido del mundo real.</li>
+          <li>El futuro ya llegó y no tuvo la decencia de avisar. Encontramos sus restos incrustados en lo que ya existía.</li>
+          <li>Cada pieza es un fragmento de un archivo mayor que nadie terminó de catalogar.</li>
+          <li>Un dato inventado es una mentira con formato de verdad. Toda coordenada en este archivo es real.</li>
+          <li>El error nunca es decoración — es el único lugar donde el sistema dice la verdad sobre sí mismo.</li>
+          <li>No restauramos monumentos. Los archivamos en el momento exacto en que empiezan a fallar.</li>
+          <li>YUX no firma piezas bonitas. Firma evidencia.</li>
+        </ol>
+        
+        <p class="font-bold font-mono-tech text-xs text-[var(--rojo)] pt-6 border-t border-[var(--hueso)]">
+          FIN DEL LOG — [ARCHIVE STATUS: INCOMPLETE]
+        </p>
+      </div>
+    </div>
+  </article>
+</Layout>
